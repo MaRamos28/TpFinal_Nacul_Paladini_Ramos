@@ -50,12 +50,13 @@ def cargar_imagen(ruta, tamaño=(60, 60)):
         quit()
         
 #carga de imagenes
-img_girasol = cargar_imagen("Imagenes\girasol.png")
-img_zombie_normal = cargar_imagen("Imagenes\zombie.png")
-img_lanzaguisante = cargar_imagen("Imagenes\lanzaguisante.png")
-img_zombie_cono = cargar_imagen("Imagenes\zombie_cono.png") 
-img_zombie_balde = cargar_imagen("Imagenes\zombie_balde.png")  # ACTUALIZAR, SE VE MAL
-img_sol = cargar_imagen("Imagenes\sol.png")
+img_girasol = cargar_imagen(r"Imagenes\girasol.png")
+img_zombie_normal = cargar_imagen(r"Imagenes\zombie.png")
+img_lanzaguisante = cargar_imagen(r"Imagenes\lanzaguisante.png")
+img_zombie_cono = cargar_imagen(r"Imagenes\zombie_cono.png")
+img_zombie_balde = cargar_imagen(r"Imagenes\zombie_balde.png") #Actualizar xq se ve mal
+img_sol = cargar_imagen(r"Imagenes\sol.png")
+
 
 jugando = True
 while jugando:

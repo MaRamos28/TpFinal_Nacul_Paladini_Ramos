@@ -88,9 +88,9 @@ while jugando:
     for planta in lista_plantas:
         planta.dibujar(ventana)
 
-    for z in lista_zombis:
-        z.mover()
-        z.dibujar(ventana)
+    for zombi in lista_zombis:
+        zombi.mover()
+        zombi.dibujar(ventana)
 
     pygame.display.update()
     clock.tick(30)

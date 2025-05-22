@@ -10,7 +10,7 @@ class Planta:
         self.y = fila * tamaño_celda
         self.vida = vida
         self.imagen = imagen
-        self.rect = pygame.Rect(self.x, self.y, 60, 100)
+        self.rect = pygame.Rect(self.x, self.y, 100, 100)
 
     def recibedaño(self):
         self.vida -= 1

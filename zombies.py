@@ -9,11 +9,11 @@ class Zombie:
         self.fila = random.randint(0, 4)
         self.x = x
         self.y = self.fila * tamaño_celda
-        self.velocidad = 1
+        self.velocidad = 100/6
         self.daño = 1
         self.tipo = tipo
         self.imagen = imagen
-        self.ancho = 60
+        self.ancho = 100
         self.alto = 100
 
         if tipo == "normal":
@@ -38,7 +38,7 @@ class Zombie:
         return False
 
     def mover(self):
-        if time.time() - self.ultimo_movimiento > 6:
+        if time.time() - self.ultimo_movimiento > 1:
             self.x -= self.velocidad
             self.rect.x = self.x
             self.ultimo_movimiento = time.time()

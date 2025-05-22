@@ -1,6 +1,8 @@
 import pygame
 from zombies import Zombie
 from plantas import Girasol, Lanzaguisantes, Nuez
+import time
+import random
 
 pygame.init()
 
@@ -12,6 +14,10 @@ alto = cant_filas * tamaño_celda
 barra_inferior_tamaño = 200
 separacion_barra_grilla = 10
 barra_inferior_inicio = alto + separacion_barra_grilla
+
+tiempo_entre_zombis = 1000
+tiempo_ulitmo_zombi = 0
+
 
 tamaño_ventana = (ancho, alto + barra_inferior_tamaño + separacion_barra_grilla)
 
@@ -78,9 +84,28 @@ plantas_disponibles = [
     ("nuez", img_nuez, pygame.Rect(250, barra_inferior_inicio + 50, 60, 60))
 ]
 
+zombis_disponibles = ("normal", "cono", "balde")
+
 jugando = True
+
 while jugando:
     reloj.tick(FPS)
+    
+    tiempo_actual = time.time()
+    if tiempo_actual - tiempo_ulitmo_zombi > tiempo_entre_zombis:
+        tiempo_ulitmo_zombi = tiempo_actual
+        
+        tipo_zombi = random.choice(zombis_disponibles)
+        
+        if tipo_zombi == "normal":
+            imagen = img_zombie_normal
+        elif tipo_zombi == "cono":
+            imagen = img_zombie_cono
+        elif tipo_zombi == "balde":
+            imagen = img_zombie_balde
+            
+        lista_zombis.append(Zombie(tipo_zombi, imagen))
+        
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             jugando = False

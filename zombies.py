@@ -5,9 +5,9 @@ import time
 tamaño_celda = 100
 
 class Zombie:
-    def __init__(self, x, tipo="normal", imagen=None):
+    def __init__(self, tipo, imagen):
         self.fila = random.randint(0, 4)
-        self.x = x
+        self.x = 900
         self.y = self.fila * tamaño_celda
         self.velocidad = 100/6
         self.daño = 1

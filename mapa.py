@@ -5,12 +5,15 @@ cant_columnas = 9
 tamaño_celda = 100
 ancho = cant_columnas * tamaño_celda
 alto = cant_filas * tamaño_celda
+FPS = 120
 
 tamaño_ventana = (ancho, alto)
 
 #Lista con los enemigos y plantas
 lista_enemigos = []
 lista_plantas = []
+
+reloj = pygame.time.Clock()
 
 ventana = pygame.display.set_mode(tamaño_ventana)
 pygame.display.set_caption("Plantas vs Zombies")
@@ -61,7 +64,7 @@ img_sol = cargar_imagen(r"Imagenes\sol.png")
 jugando = True
 while jugando:
     pygame.display.update()
-    
+    reloj.tick(FPS)
     dibujar_objeto_en_celda(0, 0, img_girasol)    
     dibujar_objeto_en_celda(0, 1, img_zombie_normal)
     dibujar_objeto_en_celda(0, 2, img_zombie_cono)

@@ -8,7 +8,7 @@ cant_columnas = 9
 tamaño_celda = 100
 ancho = cant_columnas * tamaño_celda
 alto = cant_filas * tamaño_celda
-tamaño_ventana = (ancho + 100, alto + 200)
+tamaño_ventana = (ancho, alto + 200)
 
 FPS = 120
 reloj = pygame.time.Clock()
@@ -26,9 +26,9 @@ borde = (0, 0, 0)
 grilla = [[0 for _ in range(cant_columnas)] for _ in range(cant_filas)]
 
 # Cargar imágenes
-def cargar_imagen(ruta, tamaño=(60, 100)):
+def cargar_imagen(ruta, tamaño=(100, 100)):
     try:
-        imagen = pygame.image.load(ruta).convert_alpha()
+        imagen = pygame.image.load(ruta)
         imagen = pygame.transform.scale(imagen, tamaño)
         return imagen    
     except:

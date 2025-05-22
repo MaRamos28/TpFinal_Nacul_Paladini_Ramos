@@ -28,7 +28,7 @@ FPS = 120
 reloj = pygame.time.Clock()
 
 grilla = [[0 for _ in range(cant_columnas)] for _ in range(cant_filas)]
-planta_seleccionada = "girasol"  # Valor por defecto
+planta_seleccionada = "girasol"  #por defecto
 
 img_girasol = cargar_imagen("Imagenes/girasol.png")
 img_zombie_normal = cargar_imagen("Imagenes/zombie.png")

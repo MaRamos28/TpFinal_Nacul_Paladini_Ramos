@@ -79,9 +79,9 @@ img_lanzaguisante = cargar_imagen("Imagenes/lanzaguisante.png")
 img_nuez = cargar_imagen("Imagenes/nuez.png")
 
 plantas_disponibles = [
-    ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 60, 60)),
-    ("lanzaguisante", img_lanzaguisante, pygame.Rect(150, barra_inferior_inicio + 50, 60, 60)),
-    ("nuez", img_nuez, pygame.Rect(250, barra_inferior_inicio + 50, 60, 60))
+    ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
+    ("lanzaguisante", img_lanzaguisante, pygame.Rect(200, barra_inferior_inicio + 50, 100, 100)),
+    ("nuez", img_nuez, pygame.Rect(350, barra_inferior_inicio + 50, 100, 100))
 ]
 
 zombis_disponibles = ("normal", "cono", "balde")

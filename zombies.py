@@ -1,38 +1,50 @@
-import random as rd
+import pygame
+import random
 import time
 
-class zombies:
-    def __init__(self, x, tipo="normal"):
+tamaño_celda = 100
+
+class Zombie:
+    def __init__(self, x, tipo="normal", imagen=None):
+        self.fila = random.randint(0, 4)
         self.x = x
-        self.y = rd.randint(0,4)
+        self.y = self.fila * tamaño_celda
         self.velocidad = 1
         self.daño = 1
-        
-        tipo = tipo.lower()
+        self.tipo = tipo
+        self.imagen = imagen
+        self.ancho = 60
+        self.alto = 100
+
         if tipo == "normal":
             self.vida = 10
-            self.representacion = "Z"
         elif tipo == "cono":
             self.vida = 20
-            self.representacion = "ZC"
         elif tipo == "balde":
             self.vida = 30
-            self.representacion = "ZB"
-    
+
+        self.rect = pygame.Rect(self.x, self.y, self.ancho, self.alto)
+        self.ultimo_movimiento = time.time()
+        self.ultimo_ataque = time.time()
+
     def recibedaño(self):
         self.vida -= 1
-        if self.vida == 0:
-            return True
-        else:
-            return False
+        return self.vida <= 0
 
     def ataque(self):
-        self.milis_ataque = time.time()
-        if time.time() - self.milis_ataque > 1:
-            return True    
-    
-    def movimiento(self): #Deberia ejecutarse todo el tiempo
-        self.milis_mov = time.time()
-        if time.time() - self.milis_mov > 6:
+        if time.time() - self.ultimo_ataque > 1:
+            self.ultimo_ataque = time.time()
+            return True
+        return False
+
+    def mover(self):
+        if time.time() - self.ultimo_movimiento > 6:
             self.x -= self.velocidad
-            self.milis_mov = time.time()
+            self.rect.x = self.x
+            self.ultimo_movimiento = time.time()
+
+    def dibujar(self, ventana):
+        if self.imagen:
+            ventana.blit(self.imagen, self.rect)
+        else:
+            pygame.draw.rect(ventana, (100, 0, 0), self.rect)

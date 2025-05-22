@@ -1,42 +1,35 @@
-class girasoles:
-    def __init__(self, x , y):
-        self.x = x
-        self.y = y
-        self.vida = 6
-        self.representacion = "G"
-        
-    def recibedaño(self):
-        self.vida -= 1
-        if self.vida == 0:
-            return True
-        else:
-            return False
+import pygame
 
-class lanzaguizantes:
-    def __init__(self, x , y):
-        self.x = x
-        self.y = y
-        self.vida = 6
-        self.representacion = "L"
-        self.daño 
-        
-    def recibedaño(self):
-        self.vida -= 1
-        if self.vida == 0:
-            return True
-        else:
-            return False
+tamaño_celda = 100
 
-class nuez: 
-    def __init__(self, x , y):
-        self.x = x
-        self.y = y
-        self.vida = 60
-        self.representacion = "N"
-        
+class Planta:
+    def __init__(self, fila, columna, imagen, vida):
+        self.fila = fila
+        self.columna = columna
+        self.x = columna * tamaño_celda
+        self.y = fila * tamaño_celda
+        self.vida = vida
+        self.imagen = imagen
+        self.rect = pygame.Rect(self.x, self.y, 60, 100)
+
     def recibedaño(self):
         self.vida -= 1
-        if self.vida == 0:
-            return True
+        return self.vida <= 0
+
+    def dibujar(self, ventana):
+        if self.imagen:
+            ventana.blit(self.imagen, self.rect)
         else:
-            return False
+            pygame.draw.rect(ventana, (0, 100, 0), self.rect)
+
+class Girasol(Planta):
+    def __init__(self, fila, columna, imagen):
+        super().__init__(fila, columna, imagen, vida=6)
+
+class Lanzaguisantes(Planta):
+    def __init__(self, fila, columna, imagen):
+        super().__init__(fila, columna, imagen, vida=6)
+
+class Nuez(Planta):
+    def __init__(self, fila, columna, imagen):
+        super().__init__(fila, columna, imagen, vida=60)

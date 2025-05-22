@@ -15,7 +15,7 @@ barra_inferior_tamaño = 200
 separacion_barra_grilla = 10
 barra_inferior_inicio = alto + separacion_barra_grilla
 
-tiempo_entre_zombis = 1000
+tiempo_entre_zombis = 5 #Segundos
 tiempo_ulitmo_zombi = 0
 
 
@@ -91,8 +91,10 @@ jugando = True
 while jugando:
     reloj.tick(FPS)
     
+    #Genero zombis cada 1 segundo    
     tiempo_actual = time.time()
-    if tiempo_actual - tiempo_ulitmo_zombi > tiempo_entre_zombis:
+    
+    if tiempo_actual - tiempo_ulitmo_zombi >= tiempo_entre_zombis:
         tiempo_ulitmo_zombi = tiempo_actual
         
         tipo_zombi = random.choice(zombis_disponibles)

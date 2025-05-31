@@ -48,3 +48,6 @@ class Zombie:
             ventana.blit(self.imagen, self.rect)
         else:
             pygame.draw.rect(ventana, (100, 0, 0), self.rect)
+
+    def devolver_coords(self):
+        return self.x, self.y

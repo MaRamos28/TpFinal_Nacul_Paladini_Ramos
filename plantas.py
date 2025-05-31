@@ -36,7 +36,7 @@ class Lanzaguisantes(Planta):
         self.ultimo_disparo = time.time()
 
     def puede_disparar(self):
-        return time.time() - self.ultimo_disparo >= 1.5
+        return time.time() - self.ultimo_disparo >= 2
 
     def disparar(self, img_proyectil):
         self.ultimo_disparo = time.time()
@@ -74,3 +74,6 @@ class Proyectiles:
             ventana.blit(self.imagen, self.rect)
         else:
             pygame.draw.rect(ventana, (0, 255, 0), self.rect)
+
+    def devolver_coords(self):
+        return self.x, self.y

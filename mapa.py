@@ -120,6 +120,16 @@ while jugando:
         guisante.dibujar(ventana)
         if guisante.x > ancho:
             lista_proyectiles.remove(guisante)
+            continue
+
+        for zombi in lista_zombis:
+            if guisante.rect.colliderect(zombi.rect):
+                murio = zombi.recibedaño()
+                if murio:
+                    lista_zombis.remove(zombi)
+                if guisante in lista_proyectiles:
+                    lista_proyectiles.remove(guisante)
+                break
 
     # Dibujar zombis
     for zombi in lista_zombis:

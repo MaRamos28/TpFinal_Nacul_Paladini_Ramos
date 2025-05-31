@@ -2,6 +2,7 @@ from funciones import *
 
 lista_zombis = []
 lista_plantas = []
+lista_proyectiles = []
 
 cant_filas = 5
 cant_columnas = 9
@@ -36,6 +37,7 @@ img_zombie_cono = cargar_imagen("Imagenes/zombie_cono.png")
 img_zombie_balde = cargar_imagen("Imagenes/zombie_balde.png")
 img_lanzaguisante = cargar_imagen("Imagenes/lanzaguisante.png")
 img_nuez = cargar_imagen("Imagenes/nuez.png")
+img_proyectil = cargar_imagen("Imagenes/Proyectil.png")
 
 plantas_disponibles = [
     ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
@@ -71,13 +73,16 @@ while jugando:
                 fila = y // tamaño_celda
                 columna = x // tamaño_celda
                 colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez)
-
+                generar_proyectil(lista_proyectiles, img_proyectil)
     ventana.fill(color_background)
     dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana)
 
     # Dibujar plantas
     for planta in lista_plantas:
         planta.dibujar(ventana)
+    
+    for guisante in lista_proyectiles:
+        guisante.dibujar(ventana)
 
     # Dibujar zombis
     for zombi in lista_zombis:

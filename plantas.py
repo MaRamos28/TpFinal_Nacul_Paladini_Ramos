@@ -33,3 +33,19 @@ class Lanzaguisantes(Planta):
 class Nuez(Planta):
     def __init__(self, fila, columna, imagen):
         super().__init__(fila, columna, imagen, vida=60)
+
+class Proyectiles():
+    def __init__ (self, x, y, imagen):
+        self.x = x
+        self.y = y + 40
+        self.velocidad = 5
+        self.imagen = imagen
+        self.ancho = 20
+        self.altura = 20
+        self.rect = pygame.Rect(self.x, self.y, self.ancho, self.altura)
+
+    def dibujar(self, ventana):
+        if self.imagen:
+            ventana.blit(self.imagen, self.rect)
+        else:
+            pygame.draw.rect(ventana, (0, 100, 0), self.rect)       

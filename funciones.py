@@ -1,6 +1,6 @@
 import pygame
 from zombies import Zombie
-from plantas import Girasol, Lanzaguisantes, Nuez
+from plantas import Girasol, Lanzaguisantes, Nuez, Proyectiles
 import time
 import random
 
@@ -48,3 +48,6 @@ def generar_zombi(lista_zombis, zombis_disponibles, img_zombie_normal, img_zombi
             imagen = img_zombie_balde
             
         lista_zombis.append(Zombie(tipo_zombi, imagen))
+
+def generar_proyectil(lista_proyectiles, img_proyectil):
+    lista_proyectiles.append(Proyectiles(random.randint(0, 900), random.randint(0, 500), img_proyectil))

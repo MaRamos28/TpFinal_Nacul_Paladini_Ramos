@@ -75,3 +75,4 @@ def generar_zombi(
 
 def generar_proyectil(lista_proyectiles, img_proyectil, x, y):
     lista_proyectiles.append(Proyectiles(x, y, img_proyectil))
+

@@ -16,6 +16,9 @@ barra_inferior_inicio = alto + separacion_barra_grilla
 tiempo_entre_zombis = 5  # Segundos
 tiempo_ultimo_zombi = 0
 cant_soles = 0
+pygame.init()
+pygame.mixer.init()
+
 
 tamaño_ventana = (ancho, alto + barra_inferior_tamaño + separacion_barra_grilla)
 
@@ -56,9 +59,22 @@ zombis_disponibles = ("normal", "cono", "balde")
 
 jugando = True
 
-while jugando:
+sonido_principal = pygame.mixer.Sound("musica/musica.mp3") 
+sonido_principal.set_volume(0.4)
+sonido_principal.play()
+sonido_mordida = pygame.mixer.Sound("musica/efectos/mordida.mp3")
+sonido_plantar = pygame.mixer.Sound("musica/efectos/plantar.mp3")
+sonido_golpe = pygame.mixer.Sound("musica/efectos/golpe.mp3")
+
+
+sonido_zombi_inicio = pygame.mixer.Sound("musica/efectos/zombies_are_coming.mp3")
+sonido_zombi_inicio.play()
+sonido_seleccionar = pygame.mixer.Sound("musica/efectos/seleccionar.mp3")
+
+while jugando: 
     reloj.tick(FPS)
     tiempo_actual = time.time()
+    
     if tiempo_actual - tiempo_ultimo_zombi >= tiempo_entre_zombis:
         tiempo_ultimo_zombi = tiempo_actual
         generar_zombi(
@@ -82,6 +98,7 @@ while jugando:
                     if rect.collidepoint(x, y):
                         planta_seleccionada = nombre
                         print(f"Planta seleccionada: {planta_seleccionada}")
+                        sonido_seleccionar.play()
             else:
                 fila = y // tamaño_celda
                 columna = x // tamaño_celda
@@ -97,6 +114,7 @@ while jugando:
                     img_lanzaguisante,
                     img_nuez,
                 )
+                sonido_plantar.play()
     ventana.fill(color_background)
     dibujar_grilla(
         cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana
@@ -111,9 +129,6 @@ while jugando:
                 proyectil = planta.disparar(img_proyectil)
                 lista_proyectiles.append(proyectil)
 
-                # x, y = planta.devolver_coords()
-                # generar_proyectil(lista_proyectiles, img_proyectil, x + 60, y + 30)
-                # plantas_disponibles = time.time()
 
     for guisante in lista_proyectiles:
         guisante.mover()
@@ -125,16 +140,33 @@ while jugando:
         for zombi in lista_zombis:
             if guisante.rect.colliderect(zombi.rect):
                 murio = zombi.recibedaño()
+                sonido_golpe.play()
+
                 if murio:
                     lista_zombis.remove(zombi)
                 if guisante in lista_proyectiles:
                     lista_proyectiles.remove(guisante)
                 break
 
-    # Dibujar zombis
+   
     for zombi in lista_zombis:
-        zombi.mover()
+        colisiono = False
+        for planta in lista_plantas:
+            if zombi.rect.colliderect(planta.rect):
+                colisiono = True
+                if zombi.ataque():  
+                    murio = planta.recibedaño()
+                    sonido_mordida.play()
+                    if murio:
+                        lista_plantas.remove(planta)
+                break  
+
+        if not colisiono:
+            zombi.mover()
+
         zombi.dibujar(ventana)
+
+
 
     for nombre, imagen, rect in plantas_disponibles:
         imagen_rect = imagen.get_rect(center=rect.center)

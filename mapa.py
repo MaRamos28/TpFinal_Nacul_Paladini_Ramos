@@ -1,5 +1,6 @@
 from funciones import *
 
+
 lista_zombis = []
 lista_plantas = []
 lista_proyectiles = []
@@ -45,6 +46,7 @@ img_nuez = cargar_imagen("Imagenes/nuez.png")
 img_proyectil = cargar_imagen("Imagenes/Proyectil.png")
 img_sol = cargar_imagen("Imagenes/sol.png")
 
+
 plantas_disponibles = [
     ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
     (
@@ -59,7 +61,7 @@ zombis_disponibles = ("normal", "cono", "balde")
 
 jugando = True
 
-sonido_principal = pygame.mixer.Sound("musica/musica.mp3") 
+sonido_principal = pygame.mixer.Sound("musica/musica.mp3")
 sonido_principal.set_volume(0.4)
 sonido_principal.play()
 sonido_mordida = pygame.mixer.Sound("musica/efectos/mordida.mp3")
@@ -71,10 +73,14 @@ sonido_zombi_inicio = pygame.mixer.Sound("musica/efectos/zombies_are_coming.mp3"
 sonido_zombi_inicio.play()
 sonido_seleccionar = pygame.mixer.Sound("musica/efectos/seleccionar.mp3")
 
-while jugando: 
+
+# relacionado a soles
+tiempo_ultimo_sol = 0
+intervalo_sol = 5  # seg entre nuevos soles
+while jugando:
     reloj.tick(FPS)
     tiempo_actual = time.time()
-    
+
     if tiempo_actual - tiempo_ultimo_zombi >= tiempo_entre_zombis:
         tiempo_ultimo_zombi = tiempo_actual
         generar_zombi(
@@ -119,6 +125,10 @@ while jugando:
     dibujar_grilla(
         cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana
     )
+    # quiero ver si es asi, borrador
+    for girasol in lista_plantas:
+        if Girasol in lista_plantas:
+            Girasol.dibujar(Soles)
 
     # Dibujar plantas
     for planta in lista_plantas:
@@ -128,7 +138,6 @@ while jugando:
             if planta.puede_disparar():
                 proyectil = planta.disparar(img_proyectil)
                 lista_proyectiles.append(proyectil)
-
 
     for guisante in lista_proyectiles:
         guisante.mover()
@@ -148,25 +157,22 @@ while jugando:
                     lista_proyectiles.remove(guisante)
                 break
 
-   
     for zombi in lista_zombis:
         colisiono = False
         for planta in lista_plantas:
             if zombi.rect.colliderect(planta.rect):
                 colisiono = True
-                if zombi.ataque():  
+                if zombi.ataque():
                     murio = planta.recibedaño()
                     sonido_mordida.play()
                     if murio:
                         lista_plantas.remove(planta)
-                break  
+                break
 
         if not colisiono:
             zombi.mover()
 
         zombi.dibujar(ventana)
-
-
 
     for nombre, imagen, rect in plantas_disponibles:
         imagen_rect = imagen.get_rect(center=rect.center)
@@ -175,10 +181,28 @@ while jugando:
         color_borde = (255, 0, 0) if nombre == planta_seleccionada else (0, 0, 0)
         pygame.draw.rect(ventana, color_borde, rect, 2)
 
-    # Dibujar soles
+    nueva_fila = 0
+    tiempo_actual = time.time()
+
+    if tiempo_actual - tiempo_ultimo_sol >= intervalo_sol:
+        tiempo_ultimo_sol = tiempo_actual
+        nueva_columna = random.randint(0, 9)
+        lista_soles.append(Soles(nueva_columna, nueva_fila, img_sol, "cielo"))
+
+    x, y = pygame.mouse.get_pos()
+    for sol in lista_soles[:]:
+        if sol.agarrar_sol(x, y):
+            lista_soles.remove(sol)
+            cant_soles += 25
+
     for sol in lista_soles:
         sol.dibujar(ventana)
+        if sol.tipo == "cielo":
+            sol.caida()
 
+    fuente = pygame.font.SysFont("Arial", 30)
+    texto = fuente.render(f"Soles: {cant_soles}", True, (255, 255, 0))
+    ventana.blit(texto, (10, 10))
     pygame.display.update()
 
 pygame.quit()

@@ -29,6 +29,10 @@ class Girasol(Planta):
     def __init__(self, fila, columna, imagen):
         super().__init__(fila, columna, imagen, vida=6)
 
+    # quiero ver si es asi, borrador
+    def puede_generar(self):
+        return time.time()
+
 
 class Lanzaguisantes(Planta):
     def __init__(self, fila, columna, imagen):

@@ -1,6 +1,7 @@
 import pygame
 from zombies import Zombie
 from plantas import Girasol, Lanzaguisantes, Nuez, Proyectiles
+from soles import Soles
 import time
 import random
 
@@ -76,3 +77,11 @@ def generar_zombi(
 def generar_proyectil(lista_proyectiles, img_proyectil, x, y):
     lista_proyectiles.append(Proyectiles(x, y, img_proyectil))
 
+
+# quiero ver si es asi, borrador
+def generar_soles(lista_soles, img_sol, x, y):
+    lista_soles.append(Soles(x, y, img_sol))
+
+
+# def soles_random(fila, columna, lista_soles, imagen):
+#     lista_soles.append(Soles(fila, columna, imagen))

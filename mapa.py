@@ -14,9 +14,9 @@ alto = cant_filas * tamaño_celda
 barra_inferior_tamaño = 200
 separacion_barra_grilla = 10
 barra_inferior_inicio = alto + separacion_barra_grilla
-tiempo_entre_zombis = 5  # Segundos
+tiempo_entre_zombis = 5 # Segundos
 tiempo_ultimo_zombi = 0
-cant_soles = 0
+cant_soles = 50
 pygame.init()
 pygame.mixer.init()
 
@@ -45,6 +45,7 @@ img_lanzaguisante = cargar_imagen("Imagenes/lanzaguisante.png")
 img_nuez = cargar_imagen("Imagenes/nuez.png")
 img_proyectil = cargar_imagen("Imagenes/Proyectil.png")
 img_sol = cargar_imagen("Imagenes/sol.png")
+img_pala =  cargar_imagen("Imagenes/pala.png")
 
 
 plantas_disponibles = [
@@ -55,6 +56,8 @@ plantas_disponibles = [
         pygame.Rect(200, barra_inferior_inicio + 50, 100, 100),
     ),
     ("nuez", img_nuez, pygame.Rect(350, barra_inferior_inicio + 50, 100, 100)),
+    ("pala", img_pala, pygame.Rect(500, barra_inferior_inicio + 50, 100, 100))
+    
 ]
 
 zombis_disponibles = ("normal", "cono", "balde")
@@ -132,12 +135,13 @@ while jugando:
 
     # Dibujar plantas
     for planta in lista_plantas:
-        planta.dibujar(ventana)
-
-        if isinstance(planta, Lanzaguisantes):
-            if planta.puede_disparar():
-                proyectil = planta.disparar(img_proyectil)
-                lista_proyectiles.append(proyectil)
+        for zombi in lista_zombis:
+            planta.dibujar(ventana)
+            if planta.devolver_coords()[1] == zombi.devolver_coords()[1]:
+                if isinstance(planta, Lanzaguisantes):
+                    if planta.puede_disparar():
+                        proyectil = planta.disparar(img_proyectil)
+                        lista_proyectiles.append(proyectil)
 
     for guisante in lista_proyectiles:
         guisante.mover()
@@ -155,13 +159,13 @@ while jugando:
                     lista_zombis.remove(zombi)
                 if guisante in lista_proyectiles:
                     lista_proyectiles.remove(guisante)
-                break
+                
 
     for zombi in lista_zombis:
-        colisiono = False
+        choco = False
         for planta in lista_plantas:
             if zombi.rect.colliderect(planta.rect):
-                colisiono = True
+                choco = True
                 if zombi.ataque():
                     murio = planta.recibedaño()
                     sonido_mordida.play()
@@ -169,7 +173,7 @@ while jugando:
                         lista_plantas.remove(planta)
                 break
 
-        if not colisiono:
+        if not choco:
             zombi.mover()
 
         zombi.dibujar(ventana)
@@ -187,7 +191,7 @@ while jugando:
     if tiempo_actual - tiempo_ultimo_sol >= intervalo_sol:
         tiempo_ultimo_sol = tiempo_actual
         nueva_columna = random.randint(0, 9)
-        lista_soles.append(Soles(nueva_columna, nueva_fila, img_sol, "cielo"))
+        lista_soles.append(Soles(nueva_columna, nueva_fila, img_sol, "cielo", 75, 75))
 
     x, y = pygame.mouse.get_pos()
     for sol in lista_soles[:]:
@@ -200,9 +204,26 @@ while jugando:
         if sol.tipo == "cielo":
             sol.caida()
 
+    img_sol_50 = pygame.transform.scale(img_sol, (50,50))
     fuente = pygame.font.SysFont("Arial", 30)
-    texto = fuente.render(f"Soles: {cant_soles}", True, (255, 255, 0))
-    ventana.blit(texto, (10, 10))
+    texto_sol = fuente.render(f"Soles: {cant_soles}", True, (255, 255, 0))
+    ventana.blit(texto_sol, (10, 10))
+    # texto_valor = fuente.render(f"50", True, 
+
+    # Mostrar en pantalla info juego 
+    #Girasol 
+    ventana.blit(img_sol_50 ,(35, barra_inferior_inicio + 142))
+    texto_valor_GP = fuente.render(f"50", True, (255, 255, 0))
+    ventana.blit(texto_valor_GP, (90, barra_inferior_inicio + 149))
+
+    #Girasol 
+    ventana.blit(img_sol_50 ,(165, barra_inferior_inicio + 142))
+    texto_valor_L = fuente.render(f"100", True, (255, 255, 0))
+    ventana.blit(texto_valor_L, (210, barra_inferior_inicio + 149))
+
+    ventana.blit(img_sol_50 ,(315, barra_inferior_inicio + 142, 50, 50) )
+    ventana.blit(texto_valor_GP, (365, barra_inferior_inicio + 149))
+    
     pygame.display.update()
 
 pygame.quit()

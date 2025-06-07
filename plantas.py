@@ -23,11 +23,16 @@ class Planta:
             ventana.blit(self.imagen, self.rect)
         else:
             pygame.draw.rect(ventana, (0, 100, 0), self.rect)
+    def devolver_coords(self):
+        return (self.x, self.y)
 
 
 class Girasol(Planta):
     def __init__(self, fila, columna, imagen):
         super().__init__(fila, columna, imagen, vida=6)
+    
+    def valor(self):
+        self.valor = 50
 
     # quiero ver si es asi, borrador
     def puede_generar(self):
@@ -46,13 +51,16 @@ class Lanzaguisantes(Planta):
         self.ultimo_disparo = time.time()
         return Proyectiles(self.x + 60, self.y, img_proyectil)
 
-    def devolver_coords(self):
-        return self.x, self.y
+    def valor(self):
+        self.valor = 100
 
 
 class Nuez(Planta):
     def __init__(self, fila, columna, imagen):
         super().__init__(fila, columna, imagen, vida=60)
+    
+    def valor(self):
+        self.valor = 50
 
 
 class Proyectiles:
@@ -80,4 +88,5 @@ class Proyectiles:
             pygame.draw.rect(ventana, (0, 255, 0), self.rect)
 
     def devolver_coords(self):
-        return self.x, self.y
+        return (self.x, self.y)
+

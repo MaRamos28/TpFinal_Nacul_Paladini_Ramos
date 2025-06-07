@@ -4,16 +4,22 @@ import random
 
 
 class Soles:
-    def __init__(self, columna, fila, imagen, tipo):
+    def __init__(self, columna, fila, imagen, tipo, ancho, alto):
         self.columna = columna
         self.fila = fila
-        self.imagen = imagen
         self.tipo = tipo
-
-        self.altura_random = random.randint(1, 5) * 100
+        self.ancho = ancho
+        self.alto = alto
+        self.altura_random = random.randint(1, 4) * 100
 
         self.fila_pos_y = 0 * 100
         self.fila_pos_x = columna * 100
+
+        #redimensionar la imagen
+        if imagen:
+            self.imagen = pygame.transform.scale(imagen, (self.ancho, self.alto))
+        else:
+            self.imagen = None
 
         self.rect = pygame.Rect(self.fila_pos_x, self.fila_pos_y, 100, 100)
 
@@ -31,7 +37,7 @@ class Soles:
 
         if self.tipo == "cielo":
 
-            if self.fila_pos_y < self.altura_random:
+            if self.fila_pos_y < self.altura_random :
                 self.fila_pos_y += 0.8
             else:
                 self.fila_pos_y = self.altura_random

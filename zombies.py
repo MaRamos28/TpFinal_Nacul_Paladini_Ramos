@@ -51,4 +51,4 @@ class Zombie:
             pygame.draw.rect(ventana, (100, 0, 0), self.rect)
 
     def devolver_coords(self):
-        return self.x, self.y
+        return (self.x, self.y)

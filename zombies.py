@@ -44,7 +44,8 @@ class Zombie:
             self.rect.x = self.x
             self.ultimo_movimiento = time.time()
 
-    def dibujar(self, ventana):
+    def dibujar(self, ventana, offset_y=0):
+        self.rect.topleft = (self.x, self.y + offset_y)
         if self.imagen:
             ventana.blit(self.imagen, self.rect)
         else:

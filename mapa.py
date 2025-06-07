@@ -1,5 +1,5 @@
 from funciones import *
-
+from plantas import *
 
 lista_zombis = []
 lista_plantas = []
@@ -14,7 +14,7 @@ alto = cant_filas * tamaño_celda
 barra_inferior_tamaño = 200
 separacion_barra_grilla = 10
 barra_inferior_inicio = alto + separacion_barra_grilla
-tiempo_entre_zombis = 5 # Segundos
+tiempo_entre_zombis = 5  # Segundos
 tiempo_ultimo_zombi = 0
 cant_soles = 50
 pygame.init()
@@ -45,7 +45,7 @@ img_lanzaguisante = cargar_imagen("Imagenes/lanzaguisante.png")
 img_nuez = cargar_imagen("Imagenes/nuez.png")
 img_proyectil = cargar_imagen("Imagenes/Proyectil.png")
 img_sol = cargar_imagen("Imagenes/sol.png")
-img_pala =  cargar_imagen("Imagenes/pala.png")
+img_pala = cargar_imagen("Imagenes/pala.png")
 
 
 plantas_disponibles = [
@@ -56,8 +56,7 @@ plantas_disponibles = [
         pygame.Rect(200, barra_inferior_inicio + 50, 100, 100),
     ),
     ("nuez", img_nuez, pygame.Rect(350, barra_inferior_inicio + 50, 100, 100)),
-    ("pala", img_pala, pygame.Rect(500, barra_inferior_inicio + 50, 100, 100))
-    
+    ("pala", img_pala, pygame.Rect(500, barra_inferior_inicio + 50, 100, 100)),
 ]
 
 zombis_disponibles = ("normal", "cono", "balde")
@@ -128,10 +127,6 @@ while jugando:
     dibujar_grilla(
         cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana
     )
-    # quiero ver si es asi, borrador
-    for girasol in lista_plantas:
-        if Girasol in lista_plantas:
-            Girasol.dibujar(Soles)
 
     # Dibujar plantas
     for planta in lista_plantas:
@@ -159,7 +154,6 @@ while jugando:
                     lista_zombis.remove(zombi)
                 if guisante in lista_proyectiles:
                     lista_proyectiles.remove(guisante)
-                
 
     for zombi in lista_zombis:
         choco = False
@@ -185,6 +179,7 @@ while jugando:
         color_borde = (255, 0, 0) if nombre == planta_seleccionada else (0, 0, 0)
         pygame.draw.rect(ventana, color_borde, rect, 2)
 
+    # Relacionado a los soles
     nueva_fila = 0
     tiempo_actual = time.time()
 
@@ -204,26 +199,32 @@ while jugando:
         if sol.tipo == "cielo":
             sol.caida()
 
-    img_sol_50 = pygame.transform.scale(img_sol, (50,50))
+    img_sol_50 = pygame.transform.scale(img_sol, (50, 50))
     fuente = pygame.font.SysFont("Arial", 30)
     texto_sol = fuente.render(f"Soles: {cant_soles}", True, (255, 255, 0))
     ventana.blit(texto_sol, (10, 10))
-    # texto_valor = fuente.render(f"50", True, 
 
-    # Mostrar en pantalla info juego 
-    #Girasol 
-    ventana.blit(img_sol_50 ,(35, barra_inferior_inicio + 142))
+    # los girasoles largen soles
+    for girasol in lista_plantas:
+        if isinstance(girasol, Girasol):
+            if girasol.puede_generar():
+                generar_soles(lista_soles, img_sol, girasol.columna, girasol.fila)
+
+    # Mostrar en pantalla info juego
+    # Girasol
+    ventana.blit(img_sol_50, (35, barra_inferior_inicio + 142))
     texto_valor_GP = fuente.render(f"50", True, (255, 255, 0))
     ventana.blit(texto_valor_GP, (90, barra_inferior_inicio + 149))
 
-    #Girasol 
-    ventana.blit(img_sol_50 ,(165, barra_inferior_inicio + 142))
+    # Lansaguisante
+    ventana.blit(img_sol_50, (165, barra_inferior_inicio + 142))
     texto_valor_L = fuente.render(f"100", True, (255, 255, 0))
     ventana.blit(texto_valor_L, (210, barra_inferior_inicio + 149))
 
-    ventana.blit(img_sol_50 ,(315, barra_inferior_inicio + 142, 50, 50) )
+    # Papa
+    ventana.blit(img_sol_50, (315, barra_inferior_inicio + 142, 50, 50))
     ventana.blit(texto_valor_GP, (365, barra_inferior_inicio + 149))
-    
+
     pygame.display.update()
 
 pygame.quit()

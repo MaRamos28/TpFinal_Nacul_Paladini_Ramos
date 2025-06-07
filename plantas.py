@@ -1,7 +1,10 @@
 import pygame
 import time
+from funciones import *
+
 
 tamaño_celda = 100
+tiempo_soles = 8
 
 
 class Planta:
@@ -23,6 +26,7 @@ class Planta:
             ventana.blit(self.imagen, self.rect)
         else:
             pygame.draw.rect(ventana, (0, 100, 0), self.rect)
+
     def devolver_coords(self):
         return (self.x, self.y)
 
@@ -30,13 +34,21 @@ class Planta:
 class Girasol(Planta):
     def __init__(self, fila, columna, imagen):
         super().__init__(fila, columna, imagen, vida=6)
-    
+        self.tiempo_ultimo_sol = time.time()
+        self.intervalo_sol = 8
+
     def valor(self):
         self.valor = 50
 
     # quiero ver si es asi, borrador
     def puede_generar(self):
-        return time.time()
+        if time.time() >= self.tiempo_ultimo_sol + self.intervalo_sol:
+            self.tiempo_ultimo_sol = (
+                time.time()
+            )  # actualiza el timepo del ultimo sol generado
+            # generar_soles(lista_soles, img_sol, self.columna, self.fila)
+            return True
+        return False
 
 
 class Lanzaguisantes(Planta):
@@ -58,7 +70,7 @@ class Lanzaguisantes(Planta):
 class Nuez(Planta):
     def __init__(self, fila, columna, imagen):
         super().__init__(fila, columna, imagen, vida=60)
-    
+
     def valor(self):
         self.valor = 50
 
@@ -89,4 +101,3 @@ class Proyectiles:
 
     def devolver_coords(self):
         return (self.x, self.y)
-

@@ -12,10 +12,10 @@ class Soles:
         self.alto = alto
         self.altura_random = random.randint(1, 4) * 100
 
-        self.fila_pos_y = 0 * 100
+        self.fila_pos_y = fila * 100
         self.fila_pos_x = columna * 100
 
-        #redimensionar la imagen
+        # redimensionar la imagen
         if imagen:
             self.imagen = pygame.transform.scale(imagen, (self.ancho, self.alto))
         else:
@@ -37,7 +37,7 @@ class Soles:
 
         if self.tipo == "cielo":
 
-            if self.fila_pos_y < self.altura_random :
+            if self.fila_pos_y < self.altura_random:
                 self.fila_pos_y += 0.8
             else:
                 self.fila_pos_y = self.altura_random

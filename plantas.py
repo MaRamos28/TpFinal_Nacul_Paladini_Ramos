@@ -61,8 +61,26 @@ class Lanzaguisantes(Planta):
 
 
 class Nuez(Planta):
-    def __init__(self, fila, columna, imagen):
-        super().__init__(fila, columna, imagen, vida=60)
+    def __init__(self, fila, columna, imagen_sana, imagen_mitad, imagen_dañada):
+        super().__init__(fila, columna, imagen_sana, vida=60)
+        self.imagen_sana = imagen_sana
+        self.imagen_mitad = imagen_mitad
+        self.imagen_dañada = imagen_dañada
+        self.actualizar_imagen()
+
+    def actualizar_imagen(self):
+        if self.vida <= 15:
+            self.imagen = self.imagen_dañada
+        elif self.vida <= 30:
+            self.imagen = self.imagen_mitad
+        else:
+            self.imagen = self.imagen_sana
+        self.rect = self.imagen.get_rect(topleft=(self.x, self.y))
+    
+    def recibedaño(self):
+        self.vida -= 1
+        self.actualizar_imagen()
+        return self.vida <= 0
 
     def valor(self):
         self.valor = 50

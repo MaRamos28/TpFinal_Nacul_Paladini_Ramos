@@ -5,13 +5,15 @@ lista_zombis = []
 lista_plantas = []
 lista_proyectiles = []
 lista_soles = []
+lista_cortadoras = []
 
 cant_filas = 5
 cant_columnas = 9
 tamaño_celda = 100
-ancho = cant_columnas * tamaño_celda
+margen_cortadora = 100
+ancho = margen_cortadora + (cant_columnas * tamaño_celda) 
 alto = cant_filas * tamaño_celda
-barra_inferior_tamaño = 180
+barra_superior_tamaño = 180
 separacion_barra_grilla = 10
 x = 0
 y = 0
@@ -21,15 +23,15 @@ es_vulnerable = False
 
 # NUEVO: barra arriba, offset para la grilla
 barra_inferior_inicio = 0
-offset_y_grilla = barra_inferior_tamaño + separacion_barra_grilla
+offset_y_grilla = barra_superior_tamaño + separacion_barra_grilla
 
-tiempo_entre_zombis = 5  # Segundos
+tiempo_entre_zombis = 10  # Segundos
 tiempo_ultimo_zombi = 0
 cant_soles = 50
 pygame.init()
 pygame.mixer.init()
 
-tamaño_ventana = (ancho, alto + barra_inferior_tamaño + separacion_barra_grilla)
+tamaño_ventana = (ancho, alto + barra_superior_tamaño + separacion_barra_grilla)
 
 color1 = (33, 150, 5)
 color2 = (39, 223, 10)
@@ -52,9 +54,12 @@ img_zombie_cono = cargar_imagen("Imagenes/zombie_cono.png")
 img_zombie_balde = cargar_imagen("Imagenes/zombie_balde.png")
 img_lanzaguisante = cargar_imagen("Imagenes/lanzaguisante.png")
 img_nuez = cargar_imagen("Imagenes/nuez.png")
+img_nuezmitad = cargar_imagen("Imagenes/nuez mitad.png")
+img_nuezdañada = cargar_imagen("Imagenes/nuez dañada.png")
 img_proyectil = cargar_imagen("Imagenes/Proyectil.png")
 img_sol = cargar_imagen("Imagenes/sol.png")
 img_pala = cargar_imagen("Imagenes/pala.png")
+img_cortadora = cargar_imagen("Imagenes/cortadora.png")
 
 plantas_disponibles = [
     ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
@@ -113,12 +118,13 @@ while jugando:
                     break
 
             if not sol_agarrado:
-                if y < barra_inferior_tamaño:
+                if y < barra_superior_tamaño:
                     for nombre, imagen, rect in plantas_disponibles:
                         if rect.collidepoint(x, y):
                             planta_seleccionada = nombre
                             print(f"Planta seleccionada: {planta_seleccionada}")
                             sonido_seleccionar.play()
+
                 elif y >= offset_y_grilla:
                     fila = (y - offset_y_grilla) // tamaño_celda
                     columna = x // tamaño_celda
@@ -130,12 +136,12 @@ while jugando:
                     else:
                         if (planta_seleccionada == "girasol" or planta_seleccionada == "nuez") and cant_soles >=50:
                             cant_soles-=50
-                            colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez)
+                            colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez, img_nuezmitad, img_nuezdañada)
                             sonido_plantar.play()
 
                         elif planta_seleccionada == "lanzaguisante" and cant_soles >=100:
                             cant_soles-=100
-                            colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez)
+                            colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez, img_nuezmitad, img_nuezdañada)
                             sonido_plantar.play()
 
 
@@ -143,10 +149,11 @@ while jugando:
     ventana.fill(color_background)
 
     dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana, offset_y_grilla)
+        
 
     for planta in lista_plantas:
+        planta.dibujar(ventana, offset_y_grilla)
         for zombi in lista_zombis:
-            planta.dibujar(ventana, offset_y_grilla)
             if planta.devolver_coords()[1] == zombi.devolver_coords()[1]:
                 if isinstance(planta, Lanzaguisantes):
                     if planta.puede_disparar():
@@ -178,7 +185,7 @@ while jugando:
                     sonido_mordida.play()
                     if murio:
                         lista_plantas.remove(planta)
-                        grilla[fila][columna] = 0
+                        grilla[planta.fila][planta.columna] = 0
                 break
         if not choco:
             zombi.mover()
@@ -263,10 +270,10 @@ if vidas <= 0:
         s = pygame.Surface((1000, 1000))
         s.set_alpha(128)
         s.fill((0,0,0))
-        # imagen_final = cargar_imagen("Imagenes/pantallas/mensaje.png")
-        # imagen_final = pygame.transform.scale(imagen_final, tamaño_ventana)
+        imagen_final = cargar_imagen("Imagenes/pantallas/coso.png")
+        # imagen_final = pygame.transform.scale(imagen_final, (500, 500))
         ventana.blit(s, (0,0))
-        # ventana.blit(imagen_final, (100, 100))
+        ventana.blit(imagen_final, (200, 100))
         pygame.display.flip()
         reloj.tick(FPS)
 pygame.quit()

@@ -20,7 +20,7 @@ def dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, color1, color2, bor
     for fila in range(cant_filas):
         for columna in range(cant_columnas):
             color = color1 if (fila + columna) % 2 == 0 else color2
-            x = columna * tamaño_celda
+            x = (columna * tamaño_celda) + 100
             y = fila * tamaño_celda + offset_y  # APLICO OFFSET
             rect = pygame.Rect(x, y, tamaño_celda, tamaño_celda)
             pygame.draw.rect(ventana, color, rect)
@@ -38,6 +38,8 @@ def colocar_planta(
     img_girasol,
     img_lanzaguisante,
     img_nuez,
+    img_nuezmitad,
+    img_nuezdañada
 ):
     if 0 <= fila < cant_filas and 0 <= columna < cant_columnas:
         if grilla[fila][columna] == 0:
@@ -46,8 +48,7 @@ def colocar_planta(
             elif planta_seleccionada == "lanzaguisante":
                 nueva_planta = Lanzaguisantes(fila, columna, img_lanzaguisante)
             elif planta_seleccionada == "nuez":
-                nueva_planta = Nuez(fila, columna, img_nuez)
-
+                nueva_planta = Nuez(fila, columna, img_nuez, img_nuezmitad, img_nuezdañada)
             lista_plantas.append(nueva_planta)
             grilla[fila][columna] = nueva_planta
             print(f"{planta_seleccionada} colocada en fila {fila}, columna {columna}")

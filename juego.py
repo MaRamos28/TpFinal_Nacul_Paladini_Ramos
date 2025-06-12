@@ -1,5 +1,6 @@
 from funciones import *
 from plantas import *
+from cortadora import *
 
 lista_zombis = []
 lista_plantas = []
@@ -8,7 +9,7 @@ lista_soles = []
 lista_cortadoras = []
 
 cant_filas = 5
-cant_columnas = 9
+cant_columnas = 10
 tamaño_celda = 100
 margen_cortadora = 100
 ancho = margen_cortadora + (cant_columnas * tamaño_celda) 
@@ -24,12 +25,12 @@ es_vulnerable = False
 # NUEVO: barra arriba, offset para la grilla
 barra_inferior_inicio = 0
 offset_y_grilla = barra_superior_tamaño + separacion_barra_grilla
-
 tiempo_entre_zombis = 10  # Segundos
 tiempo_ultimo_zombi = 0
 cant_soles = 50
 pygame.init()
 pygame.mixer.init()
+puntuacion = 0
 
 tamaño_ventana = (ancho, alto + barra_superior_tamaño + separacion_barra_grilla)
 
@@ -64,6 +65,7 @@ img_sol = cargar_imagen("Imagenes/sol.png")
 img_pala = cargar_imagen("Imagenes/pala.png")
 img_cortadora = cargar_imagen("Imagenes/cortadora.png")
 img_corazon = cargar_imagen("Imagenes/corazon_vida.png", tamaño=(30, 30))
+img_cesped = cargar_imagen("Imagenes/cesped.png")
 
 plantas_disponibles = [
     ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
@@ -74,6 +76,14 @@ plantas_disponibles = [
 
 zombis_disponibles = ("normal", "cono", "balde")
 pesos = (0.7, 0.2, 0.1)
+if puntuacion >= 20:
+    pesos = (0.4, 0.35, 0.25)
+    tiempo_entre_zombis = 5
+elif puntuacion >= 10:
+    pesos = (0.5, 0.3, 0.2)
+    tiempo_entre_zombis = 7
+elif puntuacion >= 5:
+    pesos = (0.6, 0.25, 0.15)
 
 # Sonidos
 sonido_principal = pygame.mixer.Sound("musica/musica.mp3")
@@ -81,14 +91,18 @@ sonido_mordida = pygame.mixer.Sound("musica/efectos/mordida.mp3")
 sonido_plantar = pygame.mixer.Sound("musica/efectos/plantar.mp3")
 sonido_golpe = pygame.mixer.Sound("musica/efectos/golpe.mp3")
 sonido_zombi_inicio = pygame.mixer.Sound("musica/efectos/zombies_are_coming.mp3")
-sonido_principal.play()
+sonido_principal.play(-1)
 sonido_principal.set_volume(0.4)
 sonido_zombi_inicio.play()
 sonido_seleccionar = pygame.mixer.Sound("musica/efectos/seleccionar.mp3")
+sonido_disparo = pygame.mixer.Sound("musica/efectos/sonido disparo.mp3")
+sonido_sol = pygame.mixer.Sound("musica/efectos/sonido sol.mp3")
 
 jugando = True
 tiempo_ultimo_sol = 0
 intervalo_sol = 5
+for fila in range(cant_filas):
+    lista_cortadoras.append(cortadora(fila, img_cortadora))
 
 while jugando:
     reloj.tick(FPS)
@@ -111,6 +125,7 @@ while jugando:
                 if sol.agarrar_sol(x, y, offset_y_grilla):
                     lista_soles.remove(sol)
                     cant_soles += 25
+                    sonido_sol.play()
 
                     for planta in lista_plantas:
                         if isinstance(planta, Girasol) and planta.sol_activo == sol:
@@ -120,7 +135,7 @@ while jugando:
 
                     sol_agarrado = True
                     break
-
+        
             if not sol_agarrado:
                 if y < barra_superior_tamaño:
                     for nombre, imagen, rect in plantas_disponibles:
@@ -128,10 +143,11 @@ while jugando:
                             planta_seleccionada = nombre
                             print(f"Planta seleccionada: {planta_seleccionada}")
                             sonido_seleccionar.play()
-
-                elif y >= offset_y_grilla:
+                
+                elif y >= offset_y_grilla and x >= margen_cortadora:
                     fila = (y - offset_y_grilla) // tamaño_celda
-                    columna = x // tamaño_celda
+                    columna = x  // tamaño_celda
+
                     if planta_seleccionada == "pala":
                         for planta in lista_plantas:
                             if planta.fila == fila and planta.columna == columna:
@@ -149,11 +165,18 @@ while jugando:
                             sonido_plantar.play()
 
 
-
     ventana.fill(color_background)
 
     dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana, offset_y_grilla)
         
+    for cortadora in lista_cortadoras:
+        cortadora.movimiento()
+        cortadora.dibujar(ventana, offset_y_grilla)
+
+        if cortadora.activada:
+            for zombi in lista_zombis[:]:
+                if cortadora.rect.colliderect(zombi):
+                    lista_zombis.remove(zombi)
 
     for planta in lista_plantas:
         planta.dibujar(ventana, offset_y_grilla)
@@ -163,6 +186,7 @@ while jugando:
                     if planta.puede_disparar():
                         proyectil = planta.disparar(img_proyectil)
                         lista_proyectiles.append(proyectil)
+                        sonido_disparo.play()
 
     for guisante in lista_proyectiles:
         guisante.mover()
@@ -177,6 +201,7 @@ while jugando:
                 sonido_golpe.play()
                 if murio:
                     lista_zombis.remove(zombi)
+                    puntuacion += 1
                 if guisante in lista_proyectiles:
                     lista_proyectiles.remove(guisante)
 
@@ -195,11 +220,11 @@ while jugando:
         if not choco:
             zombi.mover()
         zombi.dibujar(ventana, offset_y_grilla)
-        if zombi.rect.x <= 0 :
-            vidas -= 1
-            lista_zombis.remove(zombi)
-            if vidas <= 0:
-                jugando = False
+        for cortadora in lista_cortadoras:
+            if zombi.rect.colliderect(cortadora):
+                cortadora.activar()
+                if cortadora.rect.colliderect(zombi):
+                    lista_zombis.remove(zombi)
 
     for nombre, imagen, rect in plantas_disponibles:
         imagen_rect = imagen.get_rect(center=rect.center)
@@ -251,13 +276,12 @@ while jugando:
     ventana.blit(img_sol_50, (165, barra_inferior_inicio + 142))
     texto_valor_L = fuente.render(f"100", True, (255, 255, 0))
     ventana.blit(texto_valor_L, (210, barra_inferior_inicio + 149))
-
+    texto_puntuacion = fuente.render(f"Puntuacion: {puntuacion}", True, (0,0,0))
     ventana.blit(img_sol_50, (315, barra_inferior_inicio + 142, 50, 50))
     ventana.blit(texto_valor_GP, (365, barra_inferior_inicio + 149))
 
-    for i in range(vidas):
-       ventana.blit(img_corazon, (700 + i * 60, barra_inferior_inicio + 142))
-
+    #for i in range(vidas):
+    ventana.blit(texto_puntuacion, (700, barra_inferior_inicio + 142))
 
     pygame.display.update()
 
@@ -282,4 +306,5 @@ if vidas <= 0:
         ventana.blit(imagen_final, (200, 100))
         pygame.display.flip()
         reloj.tick(FPS)
+
 pygame.quit()

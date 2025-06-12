@@ -18,7 +18,7 @@ def cargar_imagen(ruta, tamaño=(100, 100)):
 
 def dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana, offset_y=0):
     for fila in range(cant_filas):
-        for columna in range(cant_columnas):
+        for columna in range(cant_columnas-1):
             color = color1 if (fila + columna) % 2 == 0 else color2
             x = (columna * tamaño_celda) + 100
             y = fila * tamaño_celda + offset_y  # APLICO OFFSET
@@ -41,7 +41,7 @@ def colocar_planta(
     img_nuezmitad,
     img_nuezdañada
 ):
-    if 0 <= fila < cant_filas and 0 <= columna < cant_columnas:
+    if 0 <= fila < cant_filas + 1 and 0 <= columna < cant_columnas:
         if grilla[fila][columna] == 0:
             if planta_seleccionada == "girasol":
                 nueva_planta = Girasol(fila, columna, img_girasol)

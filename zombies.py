@@ -8,7 +8,7 @@ tamaño_celda = 100
 class Zombie:
     def __init__(self, tipo, imagen):
         self.fila = random.randint(0, 4)
-        self.x = 900
+        self.x = 1010
         self.y = self.fila * tamaño_celda
         self.velocidad = 0.25 
         self.daño = 1

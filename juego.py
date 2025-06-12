@@ -50,8 +50,11 @@ planta_seleccionada = "girasol"
 # Cargar imágenes
 img_girasol = cargar_imagen("Imagenes/girasol.png")
 img_zombie_normal = cargar_imagen("Imagenes/zombie.png")
+img_zombie_sin_brazo = cargar_imagen("Imagenes/zombie_sin_brazo.png")
 img_zombie_cono = cargar_imagen("Imagenes/zombie_cono.png")
+img_zombie_cono_dañado = cargar_imagen("Imagenes/caracono_dañado.png")
 img_zombie_balde = cargar_imagen("Imagenes/zombie_balde.png")
+img_zombie_balde_dañado = cargar_imagen("Imagenes/balde_dañado.png")
 img_lanzaguisante = cargar_imagen("Imagenes/lanzaguisante.png")
 img_nuez = cargar_imagen("Imagenes/nuez.png")
 img_nuezmitad = cargar_imagen("Imagenes/nuez mitad.png")
@@ -60,6 +63,7 @@ img_proyectil = cargar_imagen("Imagenes/Proyectil.png")
 img_sol = cargar_imagen("Imagenes/sol.png")
 img_pala = cargar_imagen("Imagenes/pala.png")
 img_cortadora = cargar_imagen("Imagenes/cortadora.png")
+img_corazon = cargar_imagen("Imagenes/corazon_vida.png", tamaño=(30, 30))
 
 plantas_disponibles = [
     ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
@@ -69,6 +73,7 @@ plantas_disponibles = [
 ]
 
 zombis_disponibles = ("normal", "cono", "balde")
+pesos = (0.7, 0.2, 0.1)
 
 # Sonidos
 sonido_principal = pygame.mixer.Sound("musica/musica.mp3")
@@ -92,7 +97,7 @@ while jugando:
 
     if tiempo_actual - tiempo_ultimo_zombi >= tiempo_entre_zombis:
         tiempo_ultimo_zombi = tiempo_actual
-        generar_zombi(lista_zombis, zombis_disponibles, img_zombie_normal, img_zombie_cono, img_zombie_balde)
+        generar_zombi(lista_zombis, zombis_disponibles, pesos, img_zombie_normal, img_zombie_cono, img_zombie_balde)
 
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -107,7 +112,6 @@ while jugando:
                     lista_soles.remove(sol)
                     cant_soles += 25
 
-                    # AVISAR AL GIRASOL QUE SU SOL FUE AGARRADO
                     for planta in lista_plantas:
                         if isinstance(planta, Girasol) and planta.sol_activo == sol:
                             planta.tiempo_ultimo_sol = time.time()
@@ -169,6 +173,7 @@ while jugando:
         for zombi in lista_zombis:
             if guisante.rect.colliderect(zombi.rect):
                 murio = zombi.recibedaño()
+                zombi.actualizar_imagen(img_zombie_normal, img_zombie_sin_brazo, img_zombie_cono_dañado, img_zombie_balde_dañado)
                 sonido_golpe.play()
                 if murio:
                     lista_zombis.remove(zombi)
@@ -250,8 +255,9 @@ while jugando:
     ventana.blit(img_sol_50, (315, barra_inferior_inicio + 142, 50, 50))
     ventana.blit(texto_valor_GP, (365, barra_inferior_inicio + 149))
 
-    texto_vidas = fuente.render(f"vidas: {vidas}", True,(0, 0, 0))
-    ventana.blit(texto_vidas, (800, barra_inferior_inicio + 142))
+    for i in range(vidas):
+       ventana.blit(img_corazon, (700 + i * 60, barra_inferior_inicio + 142))
+
 
     pygame.display.update()
 

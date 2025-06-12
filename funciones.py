@@ -54,8 +54,8 @@ def colocar_planta(
             print(f"{planta_seleccionada} colocada en fila {fila}, columna {columna}")
 
 
-def generar_zombi(lista_zombis, zombis_disponibles, img_zombie_normal, img_zombie_cono, img_zombie_balde):
-    tipo_zombi = random.choice(zombis_disponibles)
+def generar_zombi(lista_zombis, zombis_disponibles,pesos, img_zombie_normal, img_zombie_cono, img_zombie_balde):
+    tipo_zombi = random.choices(zombis_disponibles, weights=pesos)[0]
 
     if tipo_zombi == "normal":
         imagen = img_zombie_normal

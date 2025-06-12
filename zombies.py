@@ -51,3 +51,21 @@ class Zombie:
 
     def devolver_coords(self):
         return (self.x, self.y)
+    
+    def actualizar_imagen(self, zombie, zombie_sin_brazo, zombie_cono_roto, zombie_balde_roto):
+        if self.tipo == "cono" and self.vida <= 15:
+            self.imagen = zombie_cono_roto
+        
+        elif self.tipo == "cono" and self.vida <= 10:
+            self.imagen = zombie
+            self.tipo = "normal"
+        
+        elif self.tipo == "balde" and self.vida <= 20:
+            self.imagen = zombie_balde_roto
+        
+        elif self.tipo == "balde" and self.vida <= 10:
+            self.imagen = zombie
+            self.tipo = "normal"
+        
+        elif self.tipo == "normal" and self.vida <= 5:
+            self.imagen = zombie_sin_brazo

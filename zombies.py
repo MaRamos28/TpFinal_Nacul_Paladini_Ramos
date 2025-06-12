@@ -10,7 +10,7 @@ class Zombie:
         self.fila = random.randint(0, 4)
         self.x = 900
         self.y = self.fila * tamaño_celda
-        self.velocidad = 100 / 6
+        self.velocidad = 0.3
         self.daño = 1
         self.tipo = tipo
         self.imagen = imagen
@@ -39,11 +39,9 @@ class Zombie:
         return False
 
     def mover(self):
-        if time.time() - self.ultimo_movimiento > 1:
-            self.x -= self.velocidad
-            self.rect.x = self.x
-            self.ultimo_movimiento = time.time()
-
+        self.x -= self.velocidad
+        self.rect.x = self.x
+        
     def dibujar(self, ventana, offset_y=0):
         self.rect.topleft = (self.x, self.y + offset_y)
         if self.imagen:

@@ -15,6 +15,9 @@ barra_inferior_tamaño = 180
 separacion_barra_grilla = 10
 x = 0
 y = 0
+vidas = 5
+tiempo_invulnerabilidad = 2000
+es_vulnerable = False
 
 # NUEVO: barra arriba, offset para la grilla
 barra_inferior_inicio = 0
@@ -64,12 +67,12 @@ zombis_disponibles = ("normal", "cono", "balde")
 
 # Sonidos
 sonido_principal = pygame.mixer.Sound("musica/musica.mp3")
-sonido_principal.set_volume(0.4)
-sonido_principal.play()
 sonido_mordida = pygame.mixer.Sound("musica/efectos/mordida.mp3")
 sonido_plantar = pygame.mixer.Sound("musica/efectos/plantar.mp3")
 sonido_golpe = pygame.mixer.Sound("musica/efectos/golpe.mp3")
 sonido_zombi_inicio = pygame.mixer.Sound("musica/efectos/zombies_are_coming.mp3")
+sonido_principal.play()
+sonido_principal.set_volume(0.4)
 sonido_zombi_inicio.play()
 sonido_seleccionar = pygame.mixer.Sound("musica/efectos/seleccionar.mp3")
 
@@ -80,6 +83,7 @@ intervalo_sol = 5
 while jugando:
     reloj.tick(FPS)
     tiempo_actual = time.time()
+    tiempo = pygame.time.get_ticks()
 
     if tiempo_actual - tiempo_ultimo_zombi >= tiempo_entre_zombis:
         tiempo_ultimo_zombi = tiempo_actual
@@ -118,9 +122,21 @@ while jugando:
                 elif y >= offset_y_grilla:
                     fila = (y - offset_y_grilla) // tamaño_celda
                     columna = x // tamaño_celda
-                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas,
-                                cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez)
-                    sonido_plantar.play()
+                    if planta_seleccionada == "pala":
+                        for planta in lista_plantas:
+                            if planta.fila == fila and planta.columna == columna:
+                                lista_plantas.remove(planta)
+                                grilla[fila][columna] = 0
+                    else:
+                        if (planta_seleccionada == "girasol" or planta_seleccionada == "nuez") and cant_soles >=50:
+                            cant_soles-=50
+                            colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez)
+                            sonido_plantar.play()
+
+                        elif planta_seleccionada == "lanzaguisante" and cant_soles >=100:
+                            cant_soles-=100
+                            colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez)
+                            sonido_plantar.play()
 
 
 
@@ -162,10 +178,16 @@ while jugando:
                     sonido_mordida.play()
                     if murio:
                         lista_plantas.remove(planta)
+                        grilla[fila][columna] = 0
                 break
         if not choco:
             zombi.mover()
         zombi.dibujar(ventana, offset_y_grilla)
+        if zombi.rect.x <= 0 :
+            vidas -= 1
+            lista_zombis.remove(zombi)
+            if vidas <= 0:
+                jugando = False
 
     for nombre, imagen, rect in plantas_disponibles:
         imagen_rect = imagen.get_rect(center=rect.center)
@@ -221,6 +243,30 @@ while jugando:
     ventana.blit(img_sol_50, (315, barra_inferior_inicio + 142, 50, 50))
     ventana.blit(texto_valor_GP, (365, barra_inferior_inicio + 149))
 
+    texto_vidas = fuente.render(f"vidas: {vidas}", True,(0, 0, 0))
+    ventana.blit(texto_vidas, (800, barra_inferior_inicio + 142))
+
     pygame.display.update()
 
+#pantalla de game over
+if vidas <= 0:
+    sonido_principal.stop()
+    sonido_mordida.stop()
+    game_over = True
+    while game_over:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    game_over = False
+        s = pygame.Surface((1000, 1000))
+        s.set_alpha(128)
+        s.fill((0,0,0))
+        # imagen_final = cargar_imagen("Imagenes/pantallas/mensaje.png")
+        # imagen_final = pygame.transform.scale(imagen_final, tamaño_ventana)
+        ventana.blit(s, (0,0))
+        # ventana.blit(imagen_final, (100, 100))
+        pygame.display.flip()
+        reloj.tick(FPS)
 pygame.quit()

@@ -37,7 +37,7 @@ def colocar_planta(
     cant_columnas,
     img_girasol,
     img_lanzaguisante,
-    img_nuez
+    img_nuez,
 ):
     if 0 <= fila < cant_filas and 0 <= columna < cant_columnas:
         if grilla[fila][columna] == 0:
@@ -73,3 +73,4 @@ def generar_proyectil(lista_proyectiles, img_proyectil, x, y):
 def generar_soles(lista_soles, imagen, columna, fila):
     nuevo_sol = Soles(columna, fila, imagen, "planta", 75, 75)
     lista_soles.append(nuevo_sol)
+

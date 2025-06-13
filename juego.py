@@ -23,6 +23,8 @@ vidas = 5
 tiempo_invulnerabilidad = 2000
 es_vulnerable = False
 
+pala_activa = False
+
 oleada_actual = 1  # arranca en 1, para que la primera vez entre
 mostrar_oleada = False
 tiempo_mostrar_oleada = 0
@@ -133,7 +135,10 @@ while jugando:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             jugando = False
-            
+        if evento.type == pygame.KEYDOWN:
+            if evento.key == pygame.K_ESCAPE:
+                planta_seleccionada = None
+        
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
             sol_agarrado = False  # NUEVO: inicializo bandera
@@ -160,6 +165,11 @@ while jugando:
                             planta_seleccionada = nombre
                             print(f"Planta seleccionada: {planta_seleccionada}")
                             sonido_seleccionar.play()
+                            
+                            if planta_seleccionada == "pala":
+                                pala_activa = True
+                            else:
+                                pala_activa = False
                 
                 elif y >= offset_y_grilla and x >= margen_cortadora:
                     fila = (y - offset_y_grilla) // tamaño_celda
@@ -170,6 +180,7 @@ while jugando:
                             if planta.fila == fila and planta.columna == columna:
                                 lista_plantas.remove(planta)
                                 grilla[fila][columna] = 0
+                                planta_seleccionada = None #Reinicia la planta seleccionada
                     else:
                         if columna < 10:
                             if (planta_seleccionada == "girasol" or planta_seleccionada == "nuez") and cant_soles >=50:
@@ -179,6 +190,7 @@ while jugando:
                                         cant_soles-=50
                                         colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada)
                                         sonido_plantar.play()
+                                        planta_seleccionada = None #Reinicia la planta seleccionada
 
                             elif planta_seleccionada == "lanzaguisante" and cant_soles >=100:
                                     if grilla[fila][columna] != 0:
@@ -187,6 +199,7 @@ while jugando:
                                         cant_soles-=100
                                         colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada)
                                         sonido_plantar.play()
+                                        planta_seleccionada = None #Reinicia la planta seleccionada
     # Oleadas
     if puntuacion >= 40 and oleada_actual != 6:
         pesos = (0, 0.50, 0.50)
@@ -385,18 +398,21 @@ while jugando:
     if mostrar_oleada:
         if pygame.time.get_ticks() - tiempo_mostrar_oleada < duracion_cartel:
             # Primero dibujamos el cartel de fondo
-            rect_cartel = img_cartel.get_rect(center=(ancho // 2, alto // 2))
+            rect_cartel = img_cartel.get_rect(center=(ancho // 2, alto-offset_y_grilla // 2))
             ventana.blit(img_cartel, rect_cartel)
 
             # Luego el texto por encima
             texto_oleada_central = render_texto(f"Oleada {oleada_actual}", 80, BLANCO)
-            rect_texto = texto_oleada_central.get_rect(center=(ancho // 2, alto // 2))
+            rect_texto = texto_oleada_central.get_rect(center=(ancho // 2, alto-offset_y_grilla // 2))
             ventana.blit(texto_oleada_central, rect_texto)
         else:
             mostrar_oleada = False
+            
+    if pala_activa and planta_seleccionada == "pala":
+        pos_mouse = pygame.mouse.get_pos()
+        ventana.blit(img_pala, (pos_mouse[0]-10, pos_mouse[1]-90))
 
 
-    
 
     pygame.display.update()
 

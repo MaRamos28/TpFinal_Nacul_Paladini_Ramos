@@ -12,6 +12,7 @@ cant_filas = 5
 cant_columnas = 10
 tamaño_celda = 100
 margen_cortadora = 100
+margen_derecho = 200 
 ancho = margen_cortadora + (cant_columnas * tamaño_celda) 
 alto = cant_filas * tamaño_celda
 barra_superior_tamaño = 180
@@ -22,7 +23,15 @@ vidas = 5
 tiempo_invulnerabilidad = 2000
 es_vulnerable = False
 
-# NUEVO: barra arriba, offset para la grilla
+oleada_actual = 1  # arranca en 1, para que la primera vez entre
+mostrar_oleada = False
+tiempo_mostrar_oleada = 0
+duracion_cartel = 3000  # en milisegundos (3 segundos)
+
+pausar_generacion_zombis = True
+tiempo_reinicio = pygame.time.get_ticks()  # arranca pausado
+tiempo_pausa = 4000  # 4 segundos
+
 barra_inferior_inicio = 0
 offset_y_grilla = barra_superior_tamaño + separacion_barra_grilla
 tiempo_entre_zombis = 10  # Segundos
@@ -38,6 +47,11 @@ color1 = (33, 150, 5)
 color2 = (39, 223, 10)
 color_background = (10, 223, 175)
 borde = (0, 0, 0)
+
+NEGRO = (0, 0, 0)
+BLANCO = (255, 255, 255)
+AMARILLO = (255, 255, 0)
+
 
 ventana = pygame.display.set_mode(tamaño_ventana)
 pygame.display.set_caption("Plantas vs Zombies")
@@ -64,8 +78,10 @@ img_proyectil = cargar_imagen("Imagenes/Proyectil.png")
 img_sol = cargar_imagen("Imagenes/sol.png")
 img_pala = cargar_imagen("Imagenes/pala.png")
 img_cortadora = cargar_imagen("Imagenes/cortadora.png")
-img_corazon = cargar_imagen("Imagenes/corazon_vida.png", tamaño=(30, 30))
 img_cesped = cargar_imagen("Imagenes/cesped.png")
+img_piso = cargar_imagen("Imagenes/piso.png")
+img_cartel = cargar_imagen("Imagenes/cartel.png", tamaño=(600, 300))
+
 
 plantas_disponibles = [
     ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
@@ -76,14 +92,7 @@ plantas_disponibles = [
 
 zombis_disponibles = ("normal", "cono", "balde")
 pesos = (0.7, 0.2, 0.1)
-if puntuacion >= 20:
-    pesos = (0.4, 0.35, 0.25)
-    tiempo_entre_zombis = 5
-elif puntuacion >= 10:
-    pesos = (0.5, 0.3, 0.2)
-    tiempo_entre_zombis = 7
-elif puntuacion >= 5:
-    pesos = (0.6, 0.25, 0.15)
+
 
 # Sonidos
 sonido_principal = pygame.mixer.Sound("musica/musica.mp3")
@@ -97,6 +106,7 @@ sonido_zombi_inicio.play()
 sonido_seleccionar = pygame.mixer.Sound("musica/efectos/seleccionar.mp3")
 sonido_disparo = pygame.mixer.Sound("musica/efectos/sonido disparo.mp3")
 sonido_sol = pygame.mixer.Sound("musica/efectos/sonido sol.mp3")
+sonido_cortadora = pygame.mixer.Sound("musica/efectos/cortadoraaa.mp3")
 
 jugando = True
 tiempo_ultimo_sol = 0
@@ -109,9 +119,14 @@ while jugando:
     tiempo_actual = time.time()
     tiempo = pygame.time.get_ticks()
 
-    if tiempo_actual - tiempo_ultimo_zombi >= tiempo_entre_zombis:
-        tiempo_ultimo_zombi = tiempo_actual
-        generar_zombi(lista_zombis, zombis_disponibles, pesos, img_zombie_normal, img_zombie_cono, img_zombie_balde)
+    if not pausar_generacion_zombis:
+        if tiempo_actual - tiempo_ultimo_zombi >= tiempo_entre_zombis:
+            tiempo_ultimo_zombi = tiempo_actual
+            generar_zombi(lista_zombis, zombis_disponibles, pesos, img_zombie_normal, img_zombie_cono, img_zombie_balde)
+    else:
+        if pygame.time.get_ticks() - tiempo_reinicio >= tiempo_pausa:
+            pausar_generacion_zombis = False
+
 
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -154,30 +169,104 @@ while jugando:
                                 lista_plantas.remove(planta)
                                 grilla[fila][columna] = 0
                     else:
-                        if (planta_seleccionada == "girasol" or planta_seleccionada == "nuez") and cant_soles >=50:
-                            cant_soles-=50
-                            colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez, img_nuezmitad, img_nuezdañada)
-                            sonido_plantar.play()
+                        if columna < 10:
+                            if (planta_seleccionada == "girasol" or planta_seleccionada == "nuez") and cant_soles >=50:
+                                    if grilla[fila][columna] != 0:
+                                        continue
+                                    else:
+                                        cant_soles-=50
+                                        colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez, img_nuezmitad, img_nuezdañada)
+                                        sonido_plantar.play()
 
-                        elif planta_seleccionada == "lanzaguisante" and cant_soles >=100:
-                            cant_soles-=100
-                            colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez, img_nuezmitad, img_nuezdañada)
-                            sonido_plantar.play()
+                            elif planta_seleccionada == "lanzaguisante" and cant_soles >=100:
+                                    if grilla[fila][columna] != 0:
+                                        continue
+                                    else:
+                                        cant_soles-=100
+                                        colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez, img_nuezmitad, img_nuezdañada)
+                                        sonido_plantar.play()
+    # Oleadas
+    if puntuacion >= 40 and oleada_actual != 6:
+        pesos = (0, 0.50, 0.50)
+        tiempo_entre_zombis = 3
+        oleada_actual = 6
+        mostrar_oleada = True
+        tiempo_mostrar_oleada = pygame.time.get_ticks()
+        pausar_generacion_zombis = True
+        tiempo_reinicio = pygame.time.get_ticks()
+
+    elif puntuacion >= 30 and puntuacion < 40 and oleada_actual != 5:
+        pesos = (0.10, 0.45, 0.45)
+        tiempo_entre_zombis = 4
+        oleada_actual = 5
+        mostrar_oleada = True
+        tiempo_mostrar_oleada = pygame.time.get_ticks()
+        pausar_generacion_zombis = True
+        tiempo_reinicio = pygame.time.get_ticks()
+
+    elif puntuacion >= 20 and puntuacion < 30 and oleada_actual != 4:
+        pesos = (0.4, 0.35, 0.25)
+        tiempo_entre_zombis = 5
+        oleada_actual = 4
+        mostrar_oleada = True
+        tiempo_mostrar_oleada = pygame.time.get_ticks()
+        pausar_generacion_zombis = True
+        tiempo_reinicio = pygame.time.get_ticks()
+
+    elif puntuacion >= 10 and puntuacion < 20 and oleada_actual != 3:
+        pesos = (0.5, 0.3, 0.2)
+        tiempo_entre_zombis = 7
+        oleada_actual = 3
+        mostrar_oleada = True
+        tiempo_mostrar_oleada = pygame.time.get_ticks()
+        pausar_generacion_zombis = True
+        tiempo_reinicio = pygame.time.get_ticks()
+
+    elif puntuacion >= 5 and puntuacion < 10 and oleada_actual != 2:
+        pesos = (0.6, 0.25, 0.15)
+        tiempo_entre_zombis = 5
+        oleada_actual = 2
+        mostrar_oleada = True
+        tiempo_mostrar_oleada = pygame.time.get_ticks()
+        pausar_generacion_zombis = True
+        tiempo_reinicio = pygame.time.get_ticks()
+
+    if mostrar_oleada:
+        tiempo_actual = pygame.time.get_ticks()
+        if tiempo_actual - tiempo_mostrar_oleada < duracion_cartel:
+            fuente = pygame.font.SysFont("Arial", 50)
+            texto = fuente.render(f"Oleada {oleada_actual}", True, (255, 0, 0))
+            rect = texto.get_rect(center=(ancho // 2, alto // 2))
+            ventana.blit(texto, rect)
+        else:
+            mostrar_oleada = False
+
 
 
     ventana.fill(color_background)
 
     dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana, offset_y_grilla)
-        
+    
+    for fila in range(cant_filas):
+        y = fila * tamaño_celda + offset_y_grilla
+        x_piso = margen_cortadora + (9 * tamaño_celda)
+        ventana.blit(img_piso, (x_piso, y))
+
+    
     for cortadora in lista_cortadoras:
         cortadora.movimiento()
         cortadora.dibujar(ventana, offset_y_grilla)
+            
+        if cortadora.esta_activada():
+            if not cortadora.ya_sono:
+                sonido_cortadora.play()
+                cortadora.ya_sono = True
 
-        if cortadora.activada:
             for zombi in lista_zombis[:]:
                 if cortadora.rect.colliderect(zombi):
                     lista_zombis.remove(zombi)
 
+            
     for planta in lista_plantas:
         planta.dibujar(ventana, offset_y_grilla)
         for zombi in lista_zombis:
@@ -256,8 +345,7 @@ while jugando:
 
 
     img_sol_50 = pygame.transform.scale(img_sol, (50, 50))
-    fuente = pygame.font.SysFont("Arial", 30)
-    texto_sol = fuente.render(f"Soles: {cant_soles}", True, (255, 255, 0))
+    texto_sol = render_texto(f"Soles {cant_soles}", 30, AMARILLO)
     ventana.blit(texto_sol, (10, 10))
 
     for girasol in lista_plantas:
@@ -270,18 +358,39 @@ while jugando:
 
 
     ventana.blit(img_sol_50, (35, barra_inferior_inicio + 142))
-    texto_valor_GP = fuente.render(f"50", True, (255, 255, 0))
+    texto_valor_GP = render_texto("50", 30, AMARILLO)
     ventana.blit(texto_valor_GP, (90, barra_inferior_inicio + 149))
 
     ventana.blit(img_sol_50, (165, barra_inferior_inicio + 142))
-    texto_valor_L = fuente.render(f"100", True, (255, 255, 0))
+    texto_valor_L = render_texto("100", 30, AMARILLO)
     ventana.blit(texto_valor_L, (210, barra_inferior_inicio + 149))
-    texto_puntuacion = fuente.render(f"Puntuacion: {puntuacion}", True, (0,0,0))
+    texto_puntuacion = render_texto(f"Puntuacion {puntuacion}", 30, NEGRO)
     ventana.blit(img_sol_50, (315, barra_inferior_inicio + 142, 50, 50))
     ventana.blit(texto_valor_GP, (365, barra_inferior_inicio + 149))
 
-    #for i in range(vidas):
     ventana.blit(texto_puntuacion, (700, barra_inferior_inicio + 142))
+    
+    
+    texto_oleada = render_texto(f"Oleada {oleada_actual}", 30, NEGRO)
+    ventana.blit(texto_oleada, (700, barra_inferior_inicio + 110))
+
+    
+    # Dibujar la oleada actual
+    if mostrar_oleada:
+        if pygame.time.get_ticks() - tiempo_mostrar_oleada < duracion_cartel:
+            # Primero dibujamos el cartel de fondo
+            rect_cartel = img_cartel.get_rect(center=(ancho // 2, alto // 2))
+            ventana.blit(img_cartel, rect_cartel)
+
+            # Luego el texto por encima
+            texto_oleada_central = render_texto(f"Oleada {oleada_actual}", 80, BLANCO)
+            rect_texto = texto_oleada_central.get_rect(center=(ancho // 2, alto // 2))
+            ventana.blit(texto_oleada_central, rect_texto)
+        else:
+            mostrar_oleada = False
+
+
+    
 
     pygame.display.update()
 
@@ -301,7 +410,6 @@ if vidas <= 0:
         s.set_alpha(128)
         s.fill((0,0,0))
         imagen_final = cargar_imagen("Imagenes/pantallas/coso.png")
-        # imagen_final = pygame.transform.scale(imagen_final, (500, 500))
         ventana.blit(s, (0,0))
         ventana.blit(imagen_final, (200, 100))
         pygame.display.flip()

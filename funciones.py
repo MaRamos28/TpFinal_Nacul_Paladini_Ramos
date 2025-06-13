@@ -18,7 +18,7 @@ def cargar_imagen(ruta, tamaño=(100, 100)):
 
 def dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana, offset_y=0):
     for fila in range(cant_filas):
-        for columna in range(cant_columnas-1):
+        for columna in range(cant_columnas):
             color = color1 if (fila + columna) % 2 == 0 else color2
             x = (columna * tamaño_celda) + 100
             y = fila * tamaño_celda + offset_y  # APLICO OFFSET
@@ -26,6 +26,9 @@ def dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, color1, color2, bor
             pygame.draw.rect(ventana, color, rect)
             pygame.draw.rect(ventana, borde, rect, 1)
 
+def render_texto(texto, tamaño, color, ruta_fuente_pvz="Letra/ZOMBIE.TTF"):
+    fuente = pygame.font.Font(ruta_fuente_pvz, tamaño)
+    return fuente.render(texto, True, color)
 
 def colocar_planta(
     fila,

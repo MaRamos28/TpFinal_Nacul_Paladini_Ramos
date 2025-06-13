@@ -53,14 +53,14 @@ class Zombie:
         return (self.x, self.y)
     
     def actualizar_imagen(self, zombie, zombie_sin_brazo, zombie_cono_roto, zombie_balde_roto):
-        if self.tipo == "cono" and self.vida <= 15:
+        if self.tipo == "cono" and self.vida <= 15 and self.vida > 10:
             self.imagen = zombie_cono_roto
         
         elif self.tipo == "cono" and self.vida <= 10:
             self.imagen = zombie
             self.tipo = "normal"
         
-        elif self.tipo == "balde" and self.vida <= 20:
+        elif self.tipo == "balde" and self.vida <= 20 and self.vida > 10:
             self.imagen = zombie_balde_roto
         
         elif self.tipo == "balde" and self.vida <= 10:

@@ -45,19 +45,44 @@ class Girasol(Planta):
         return self.sol_activo is None and time.time() - self.tiempo_ultimo_sol >= self.intervalo_sol
 
 class Lanzaguisantes(Planta):
-    def __init__(self, fila, columna, imagen):
+    def __init__(self, fila, columna, imagen, imagen_disparo):
         super().__init__(fila, columna, imagen, vida=6)
+        self.imagen_normal = imagen
+        self.imagen_disparo = imagen_disparo
+        self.estado = "normal"  # puede ser "normal" o "preparando"
+        self.tiempo_preparacion = 0.3  # segundos de preparación
         self.ultimo_disparo = time.time()
+        self.inicio_preparacion = 0
+        self.proyectil_pendiente = False
 
     def puede_disparar(self):
-        return time.time() - self.ultimo_disparo >= 2
+        return time.time() - self.ultimo_disparo >= 2 and self.estado == "normal"
+
+    def preparar_disparo(self):
+        self.estado = "preparando"
+        self.inicio_preparacion = time.time()
+        self.proyectil_pendiente = True
+
+    def actualizar_animacion(self):
+        if self.estado == "preparando":
+            if time.time() - self.inicio_preparacion >= self.tiempo_preparacion:
+                self.estado = "normal"
+                self.ultimo_disparo = time.time()
+                return True
+        return False
 
     def disparar(self, img_proyectil):
-        self.ultimo_disparo = time.time()
         return Proyectiles(self.x + 60, self.y, img_proyectil)
+
+    def dibujar(self, ventana, offset_y=0):
+        if self.estado == "preparando":
+            ventana.blit(self.imagen_disparo, (self.x, self.y + offset_y))
+        else:
+            ventana.blit(self.imagen_normal, (self.x, self.y + offset_y))
 
     def valor(self):
         self.valor = 100
+
 
 
 class Nuez(Planta):

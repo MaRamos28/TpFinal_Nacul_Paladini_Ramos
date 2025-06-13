@@ -36,7 +36,7 @@ barra_inferior_inicio = 0
 offset_y_grilla = barra_superior_tamaño + separacion_barra_grilla
 tiempo_entre_zombis = 10  # Segundos
 tiempo_ultimo_zombi = 0
-cant_soles = 50
+cant_soles = 5000
 pygame.init()
 pygame.mixer.init()
 puntuacion = 0
@@ -71,6 +71,7 @@ img_zombie_cono_dañado = cargar_imagen("Imagenes/caracono_dañado.png")
 img_zombie_balde = cargar_imagen("Imagenes/zombie_balde.png")
 img_zombie_balde_dañado = cargar_imagen("Imagenes/balde_dañado.png")
 img_lanzaguisante = cargar_imagen("Imagenes/lanzaguisante.png")
+img_lanzaguisante_dispara = cargar_imagen("Imagenes/lanzaguisanteDispara.png")
 img_nuez = cargar_imagen("Imagenes/nuez.png")
 img_nuezmitad = cargar_imagen("Imagenes/nuez mitad.png")
 img_nuezdañada = cargar_imagen("Imagenes/nuez dañada.png")
@@ -80,8 +81,7 @@ img_pala = cargar_imagen("Imagenes/pala.png")
 img_cortadora = cargar_imagen("Imagenes/cortadora.png")
 img_cesped = cargar_imagen("Imagenes/cesped.png")
 img_piso = cargar_imagen("Imagenes/piso.png")
-img_pasto_claro = cargar_imagen("Imagenes/pastoClaro.png")
-img_pasto_oscuro = cargar_imagen("Imagenes/pastoOscuro.png")
+img_fondo_grilla = cargar_imagen("Imagenes/imagenFondoGrilla.png", tamaño=(1000, 500))
 img_cartel = cargar_imagen("Imagenes/cartel.png", tamaño=(600, 300))
 
 
@@ -177,7 +177,7 @@ while jugando:
                                         continue
                                     else:
                                         cant_soles-=50
-                                        colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez, img_nuezmitad, img_nuezdañada)
+                                        colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada)
                                         sonido_plantar.play()
 
                             elif planta_seleccionada == "lanzaguisante" and cant_soles >=100:
@@ -185,7 +185,7 @@ while jugando:
                                         continue
                                     else:
                                         cant_soles-=100
-                                        colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_nuez, img_nuezmitad, img_nuezdañada)
+                                        colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada)
                                         sonido_plantar.play()
     # Oleadas
     if puntuacion >= 40 and oleada_actual != 6:
@@ -247,7 +247,7 @@ while jugando:
 
     ventana.fill(color_background)
 
-    dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, img_pasto_claro, img_pasto_oscuro, ventana, offset_y_grilla)
+    ventana.blit(img_fondo_grilla, (margen_cortadora, offset_y_grilla))
 
     for fila in range(cant_filas):
         y = fila * tamaño_celda + offset_y_grilla
@@ -275,9 +275,13 @@ while jugando:
             if planta.devolver_coords()[1] == zombi.devolver_coords()[1]:
                 if isinstance(planta, Lanzaguisantes):
                     if planta.puede_disparar():
+                        planta.preparar_disparo()
+
+                    if planta.actualizar_animacion():  # si devuelve True, ahí dispara
                         proyectil = planta.disparar(img_proyectil)
                         lista_proyectiles.append(proyectil)
                         sonido_disparo.play()
+
 
     for guisante in lista_proyectiles:
         guisante.mover()

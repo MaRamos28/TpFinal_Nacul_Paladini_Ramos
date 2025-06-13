@@ -15,21 +15,6 @@ def cargar_imagen(ruta, tamaño=(100, 100)):
         print("Error al cargar imagen:", ruta)
         return None
 
-
-def dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, img_claro, img_oscuro, ventana, offset_y=0):
-    for fila in range(cant_filas):
-        for columna in range(cant_columnas):
-            # Alternar imágenes como alternabas los colores
-            if (fila + columna) % 2 == 0:
-                imagen = img_claro
-            else:
-                imagen = img_oscuro
-
-            x = (columna * tamaño_celda) + 100
-            y = fila * tamaño_celda + offset_y
-            ventana.blit(imagen, (x, y))
-
-
 def render_texto(texto, tamaño, color, ruta_fuente_pvz="Letra/ZOMBIE.TTF"):
     fuente = pygame.font.Font(ruta_fuente_pvz, tamaño)
     return fuente.render(texto, True, color)
@@ -44,6 +29,7 @@ def colocar_planta(
     cant_columnas,
     img_girasol,
     img_lanzaguisante,
+    img_lanzaguisante_dispara,
     img_nuez,
     img_nuezmitad,
     img_nuezdañada
@@ -53,7 +39,8 @@ def colocar_planta(
             if planta_seleccionada == "girasol":
                 nueva_planta = Girasol(fila, columna, img_girasol)
             elif planta_seleccionada == "lanzaguisante":
-                nueva_planta = Lanzaguisantes(fila, columna, img_lanzaguisante)
+                nueva_planta = Lanzaguisantes(fila, columna, img_lanzaguisante, img_lanzaguisante_dispara)
+
             elif planta_seleccionada == "nuez":
                 nueva_planta = Nuez(fila, columna, img_nuez, img_nuezmitad, img_nuezdañada)
             lista_plantas.append(nueva_planta)

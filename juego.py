@@ -80,6 +80,8 @@ img_pala = cargar_imagen("Imagenes/pala.png")
 img_cortadora = cargar_imagen("Imagenes/cortadora.png")
 img_cesped = cargar_imagen("Imagenes/cesped.png")
 img_piso = cargar_imagen("Imagenes/piso.png")
+img_pasto_claro = cargar_imagen("Imagenes/pastoClaro.png")
+img_pasto_oscuro = cargar_imagen("Imagenes/pastoOscuro.png")
 img_cartel = cargar_imagen("Imagenes/cartel.png", tamaño=(600, 300))
 
 
@@ -245,8 +247,8 @@ while jugando:
 
     ventana.fill(color_background)
 
-    dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana, offset_y_grilla)
-    
+    dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, img_pasto_claro, img_pasto_oscuro, ventana, offset_y_grilla)
+
     for fila in range(cant_filas):
         y = fila * tamaño_celda + offset_y_grilla
         x_piso = margen_cortadora + (9 * tamaño_celda)

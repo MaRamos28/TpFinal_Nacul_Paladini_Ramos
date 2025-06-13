@@ -16,15 +16,19 @@ def cargar_imagen(ruta, tamaño=(100, 100)):
         return None
 
 
-def dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, color1, color2, borde, ventana, offset_y=0):
+def dibujar_grilla(cant_filas, cant_columnas, tamaño_celda, img_claro, img_oscuro, ventana, offset_y=0):
     for fila in range(cant_filas):
         for columna in range(cant_columnas):
-            color = color1 if (fila + columna) % 2 == 0 else color2
+            # Alternar imágenes como alternabas los colores
+            if (fila + columna) % 2 == 0:
+                imagen = img_claro
+            else:
+                imagen = img_oscuro
+
             x = (columna * tamaño_celda) + 100
-            y = fila * tamaño_celda + offset_y  # APLICO OFFSET
-            rect = pygame.Rect(x, y, tamaño_celda, tamaño_celda)
-            pygame.draw.rect(ventana, color, rect)
-            pygame.draw.rect(ventana, borde, rect, 1)
+            y = fila * tamaño_celda + offset_y
+            ventana.blit(imagen, (x, y))
+
 
 def render_texto(texto, tamaño, color, ruta_fuente_pvz="Letra/ZOMBIE.TTF"):
     fuente = pygame.font.Font(ruta_fuente_pvz, tamaño)

@@ -88,52 +88,52 @@ class Lanzaguisantes(Planta):
         self.valor = 100
 
 
-# class LanzaguisantesTripe(Planta):
+class LanzaguisantesTriple(Planta):
 
-#     def __init__(self, fila, columna, imagen, imagen_disparo):
-#         super().__init__(fila, columna, imagen, vida=6)
-#         self.imagen_normal = imagen
-#         self.imagen_disparo = imagen_disparo
-#         self.estado = "normal"  # puede ser "normal" o "preparando"
-#         self.tiempo_preparacion = 0.3  # segundos de preparación
-#         self.ultimo_disparo = time.time()
-#         self.inicio_preparacion = 0
-#         self.proyectil_pendiente = False
+    def __init__(self, fila, columna, imagen, imagen_disparo):
+        super().__init__(fila, columna, imagen, vida=6)
+        self.imagen_normal = imagen
+        self.imagen_disparo = imagen_disparo
+        self.estado = "normal"  # puede ser "normal" o "preparando"
+        self.tiempo_preparacion = 0.3  # segundos de preparación
+        self.ultimo_disparo = time.time()
+        self.inicio_preparacion = 0
+        self.proyectil_pendiente = False
 
-#     def puede_disparar(self):
-#         return time.time() - self.ultimo_disparo >= 2 and self.estado == "normal"
+    def puede_disparar(self):
+        return time.time() - self.ultimo_disparo >= 2 and self.estado == "normal"
 
-#     def preparar_disparo(self):
-#         self.estado = "preparando"
-#         self.inicio_preparacion = time.time()
-#         self.proyectil_pendiente = True
+    def preparar_disparo(self):
+        self.estado = "preparando"
+        self.inicio_preparacion = time.time()
+        self.proyectil_pendiente = True
 
-#     def actualizar_animacion(self):
-#         if self.estado == "preparando":
-#             if time.time() - self.inicio_preparacion >= self.tiempo_preparacion:
-#                 self.estado = "normal"
-#                 self.ultimo_disparo = time.time()
-#                 return True
-#         return False
+    def actualizar_animacion(self):
+        if self.estado == "preparando":
+            if time.time() - self.inicio_preparacion >= self.tiempo_preparacion:
+                self.estado = "normal"
+                self.ultimo_disparo = time.time()
+                return True
+        return False
 
-#     def disparar(self, img_proyectil):
-#         # dispara tres bolas
-#         proyectiles = [
-#             Proyectiles(self.x + 60 , self.y, img_proyectil),
-#             Proyectiles(self.x + 70, self.y, img_proyectil),
-#             Proyectiles(self.x + 80 , self.y, img_proyectil),
-#         ]
+    def disparar(self, img_proyectil):
+        # dispara tres bolas
+        proyectiles = [
+            Proyectiles(self.x + 60, self.y, img_proyectil),
+            Proyectiles(self.x + 70, self.y, img_proyectil),
+            Proyectiles(self.x + 80, self.y, img_proyectil),
+        ]
 
-#         return proyectiles
+        return proyectiles
 
-#     def dibujar(self, ventana, offset_y=0):
-#         if self.estado == "preparando":
-#             ventana.blit(self.imagen_disparo, (self.x, self.y + offset_y))
-#         else:
-#             ventana.blit(self.imagen_normal, (self.x, self.y + offset_y))
+    def dibujar(self, ventana, offset_y=0):
+        if self.estado == "preparando":
+            ventana.blit(self.imagen_disparo, (self.x, self.y + offset_y))
+        else:
+            ventana.blit(self.imagen_normal, (self.x, self.y + offset_y))
 
-#     def valor(self):
-#         self.valor = 100
+    def valor(self):
+        self.valor = 100
 
 
 class Nuez(Planta):

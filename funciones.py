@@ -1,6 +1,6 @@
 import pygame
 from zombies import Zombie
-from plantas import Girasol, Lanzaguisantes, Nuez, Proyectiles
+from plantas import Girasol, Lanzaguisantes, Nuez, Proyectiles, LanzaguisantesTriple
 from soles import Soles
 
 import time
@@ -40,23 +40,28 @@ def colocar_planta(
 ):
     if 0 <= fila < cant_filas + 1 and 0 <= columna < cant_columnas:
         if grilla[fila][columna] == 0:
+            nueva_planta = None
             if planta_seleccionada == "girasol":
                 nueva_planta = Girasol(fila, columna, img_girasol)
-            if planta_seleccionada == "lanzaguisante":
+            elif planta_seleccionada == "lanzaguisante":
                 nueva_planta = Lanzaguisantes(
                     fila, columna, img_lanzaguisante, img_lanzaguisante_dispara
                 )
-
-            if planta_seleccionada == "nuez":
+            elif planta_seleccionada == "nuez":
                 nueva_planta = Nuez(
                     fila, columna, img_nuez, img_nuezmitad, img_nuezdañada
                 )
-            lista_plantas.append(nueva_planta)
-            grilla[fila][columna] = nueva_planta
-            print(f"{planta_seleccionada} colocada en fila {fila}, columna {columna}")
+            elif planta_seleccionada == "lanzaguisanteTriple":
+                nueva_planta = LanzaguisantesTriple(
+                    fila, columna, img_lanzaguisante, img_tralladora_dispara
+                )
+            if nueva_planta is not None:
+                lista_plantas.append(nueva_planta)
+                grilla[fila][columna] = nueva_planta
+                print(f"{planta_seleccionada} colocada en fila {fila}, columna {columna}")
+            else:
+                print(f"Error: planta desconocida {planta_seleccionada}")
 
-            # if planta_seleccionada == "lanzaguisantesTripe":
-            #     nueva_planta = LanzaguisantesTripe(fila, columna, img_lanzaguisante, img_tralladora_dispara)
 
 
 def generar_zombi(

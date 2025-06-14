@@ -88,7 +88,7 @@ img_cartel = cargar_imagen("Imagenes/cartel.png", tamaño=(600, 300))
 img_mute = cargar_imagen("Imagenes/mutear.png", tamaño=(50, 50))
 img_unmute = cargar_imagen("Imagenes/unmute.png", tamaño=(50, 50))
 rect_mute = pygame.Rect(1000, 50, 50, 50)
-img_tralladora = cargar_imagen("imagenes/GuisantralladoraPvz1.webp")
+img_tralladora = cargar_imagen("imagenes/GuisantralladoraPvz1.png")
 img_tralladora_dispara = cargar_imagen("imagenes/tralladoraDispara.png")
 
 plantas_disponibles = [
@@ -100,11 +100,11 @@ plantas_disponibles = [
     ),
     ("nuez", img_nuez, pygame.Rect(350, barra_inferior_inicio + 50, 100, 100)),
     ("pala", img_pala, pygame.Rect(500, barra_inferior_inicio + 50, 100, 100)),
-    # (
-    #     "guisantralladora",
-    #     img_tralladora,
-    #     pygame.Rect(650, barra_inferior_inicio + 50, 100, 100),
-    # ),
+    (
+        "lanzaguisanteTriple",
+        img_tralladora,
+        pygame.Rect(650, barra_inferior_inicio + 50, 100, 100),
+    ),
 ]
 
 zombis_disponibles = ("normal", "cono", "balde")
@@ -171,15 +171,10 @@ while jugando:
                 sonido_muteado = not sonido_muteado
                 print("muteado:", sonido_muteado)
                 if sonido_muteado:
-                    # ventana.blit(img_unmute, rect_mute.topleft)
+
                     nuevo_volumen = 0.0
                 else:
-                    # ventana.blit(img_unmute, rect_mute.topleft)
                     nuevo_volumen = volumen_original
-
-                # if sonido_muteado:
-
-                #     else:
 
                 sonido_principal.set_volume(nuevo_volumen)
                 sonido_mordida.set_volume(nuevo_volumen)
@@ -290,6 +285,33 @@ while jugando:
                                     planta_seleccionada = (
                                         None  # Reinicia la planta seleccionada
                                     )
+                            elif (
+                                planta_seleccionada == "lanzaguisanteTriple"
+                                and cant_soles >= 200
+                            ):
+                                if grilla[fila][columna] != 0:
+                                    continue
+                                else:
+                                    cant_soles -= 200
+                                    colocar_planta(
+                                        fila,
+                                        columna,
+                                        planta_seleccionada,
+                                        grilla,
+                                        lista_plantas,
+                                        cant_filas,
+                                        cant_columnas,
+                                        img_girasol,
+                                        img_lanzaguisante,
+                                        img_lanzaguisante_dispara,
+                                        img_nuez,
+                                        img_nuezmitad,
+                                        img_nuezdañada,
+                                        img_tralladora_dispara,
+                                    ) 
+                                    sonido_plantar.play()
+                                    planta_seleccionada = None
+
     # Oleadas
     if puntuacion >= 40 and oleada_actual != 6:
         pesos = (0, 0.50, 0.50)
@@ -376,10 +398,15 @@ while jugando:
                     if planta.puede_disparar():
                         planta.preparar_disparo()
 
-                    if planta.actualizar_animacion():  # si devuelve True, ahí dispara
+                    if planta.actualizar_animacion():
                         proyectil = planta.disparar(img_proyectil)
                         lista_proyectiles.append(proyectil)
                         sonido_disparo.play()
+                elif isinstance(planta, LanzaguisantesTriple):
+                    proyectiles = planta.disparar(img_proyectil)
+                    for p in proyectiles:
+                        lista_proyectiles.append(p)
+                    sonido_disparo.play()
 
     for guisante in lista_proyectiles:
         guisante.mover()

@@ -12,8 +12,8 @@ cant_filas = 5
 cant_columnas = 10
 tamaño_celda = 100
 margen_cortadora = 100
-margen_derecho = 200 
-ancho = margen_cortadora + (cant_columnas * tamaño_celda) 
+margen_derecho = 200
+ancho = margen_cortadora + (cant_columnas * tamaño_celda)
 alto = cant_filas * tamaño_celda
 barra_superior_tamaño = 180
 separacion_barra_grilla = 10
@@ -85,13 +85,26 @@ img_cesped = cargar_imagen("Imagenes/cesped.png")
 img_piso = cargar_imagen("Imagenes/piso.png")
 img_fondo_grilla = cargar_imagen("Imagenes/imagenFondoGrilla.png", tamaño=(1000, 500))
 img_cartel = cargar_imagen("Imagenes/cartel.png", tamaño=(600, 300))
-
+img_mute = cargar_imagen("Imagenes/mutear.png", tamaño=(50, 50))
+img_unmute = cargar_imagen("Imagenes/unmute.png", tamaño=(50, 50))
+rect_mute = pygame.Rect(1000, 50, 50, 50)
+img_tralladora = cargar_imagen("imagenes/GuisantralladoraPvz1.webp")
+img_tralladora_dispara = cargar_imagen("imagenes/tralladoraDispara.png")
 
 plantas_disponibles = [
     ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
-    ("lanzaguisante", img_lanzaguisante, pygame.Rect(200, barra_inferior_inicio + 50, 100, 100)),
+    (
+        "lanzaguisante",
+        img_lanzaguisante,
+        pygame.Rect(200, barra_inferior_inicio + 50, 100, 100),
+    ),
     ("nuez", img_nuez, pygame.Rect(350, barra_inferior_inicio + 50, 100, 100)),
     ("pala", img_pala, pygame.Rect(500, barra_inferior_inicio + 50, 100, 100)),
+    # (
+    #     "guisantralladora",
+    #     img_tralladora,
+    #     pygame.Rect(650, barra_inferior_inicio + 50, 100, 100),
+    # ),
 ]
 
 zombis_disponibles = ("normal", "cono", "balde")
@@ -115,6 +128,10 @@ sonido_cortadora = pygame.mixer.Sound("musica/efectos/cortadoraaa.mp3")
 jugando = True
 tiempo_ultimo_sol = 0
 intervalo_sol = 5
+
+# sonido
+sonido_muteado = False
+volumen_original = 0.4
 for fila in range(cant_filas):
     lista_cortadoras.append(cortadora(fila, img_cortadora))
 
@@ -126,11 +143,17 @@ while jugando:
     if not pausar_generacion_zombis:
         if tiempo_actual - tiempo_ultimo_zombi >= tiempo_entre_zombis:
             tiempo_ultimo_zombi = tiempo_actual
-            generar_zombi(lista_zombis, zombis_disponibles, pesos, img_zombie_normal, img_zombie_cono, img_zombie_balde)
+            generar_zombi(
+                lista_zombis,
+                zombis_disponibles,
+                pesos,
+                img_zombie_normal,
+                img_zombie_cono,
+                img_zombie_balde,
+            )
     else:
         if pygame.time.get_ticks() - tiempo_reinicio >= tiempo_pausa:
             pausar_generacion_zombis = False
-
 
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -138,10 +161,35 @@ while jugando:
         if evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_ESCAPE:
                 planta_seleccionada = None
-        
+
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
             sol_agarrado = False  # NUEVO: inicializo bandera
+
+            # sonido mute
+            if rect_mute.collidepoint(x, y):
+                sonido_muteado = not sonido_muteado
+                print("muteado:", sonido_muteado)
+                if sonido_muteado:
+                    # ventana.blit(img_unmute, rect_mute.topleft)
+                    nuevo_volumen = 0.0
+                else:
+                    # ventana.blit(img_unmute, rect_mute.topleft)
+                    nuevo_volumen = volumen_original
+
+                # if sonido_muteado:
+
+                #     else:
+
+                sonido_principal.set_volume(nuevo_volumen)
+                sonido_mordida.set_volume(nuevo_volumen)
+                sonido_plantar.set_volume(nuevo_volumen)
+                sonido_golpe.set_volume(nuevo_volumen)
+                sonido_zombi_inicio.set_volume(nuevo_volumen)
+                sonido_seleccionar.set_volume(nuevo_volumen)
+                sonido_disparo.set_volume(nuevo_volumen)
+                sonido_sol.set_volume(nuevo_volumen)
+                sonido_cortadora.set_volume(nuevo_volumen)
 
             for sol in lista_soles[:]:
                 if sol.agarrar_sol(x, y, offset_y_grilla):
@@ -157,7 +205,7 @@ while jugando:
 
                     sol_agarrado = True
                     break
-        
+
             if not sol_agarrado:
                 if y < barra_superior_tamaño:
                     for nombre, imagen, rect in plantas_disponibles:
@@ -165,41 +213,83 @@ while jugando:
                             planta_seleccionada = nombre
                             print(f"Planta seleccionada: {planta_seleccionada}")
                             sonido_seleccionar.play()
-                            
+
                             if planta_seleccionada == "pala":
                                 pala_activa = True
                             else:
                                 pala_activa = False
-                
+
                 elif y >= offset_y_grilla and x >= margen_cortadora:
                     fila = (y - offset_y_grilla) // tamaño_celda
-                    columna = x  // tamaño_celda
+                    columna = x // tamaño_celda
 
                     if planta_seleccionada == "pala":
                         for planta in lista_plantas:
                             if planta.fila == fila and planta.columna == columna:
                                 lista_plantas.remove(planta)
                                 grilla[fila][columna] = 0
-                                planta_seleccionada = None #Reinicia la planta seleccionada
+                                planta_seleccionada = (
+                                    None  # Reinicia la planta seleccionada
+                                )
                     else:
                         if columna < 10:
-                            if (planta_seleccionada == "girasol" or planta_seleccionada == "nuez") and cant_soles >=50:
-                                    if grilla[fila][columna] != 0:
-                                        continue
-                                    else:
-                                        cant_soles-=50
-                                        colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada)
-                                        sonido_plantar.play()
-                                        planta_seleccionada = None #Reinicia la planta seleccionada
+                            if (
+                                planta_seleccionada == "girasol"
+                                or planta_seleccionada == "nuez"
+                            ) and cant_soles >= 50:
+                                if grilla[fila][columna] != 0:
+                                    continue
+                                else:
+                                    cant_soles -= 50
+                                    colocar_planta(
+                                        fila,
+                                        columna,
+                                        planta_seleccionada,
+                                        grilla,
+                                        lista_plantas,
+                                        cant_filas,
+                                        cant_columnas,
+                                        img_girasol,
+                                        img_lanzaguisante,
+                                        img_lanzaguisante_dispara,
+                                        img_nuez,
+                                        img_nuezmitad,
+                                        img_nuezdañada,
+                                        img_tralladora_dispara,
+                                    )
+                                    sonido_plantar.play()
+                                    planta_seleccionada = (
+                                        None  # Reinicia la planta seleccionada
+                                    )
 
-                            elif planta_seleccionada == "lanzaguisante" and cant_soles >=100:
-                                    if grilla[fila][columna] != 0:
-                                        continue
-                                    else:
-                                        cant_soles-=100
-                                        colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada)
-                                        sonido_plantar.play()
-                                        planta_seleccionada = None #Reinicia la planta seleccionada
+                            elif (
+                                planta_seleccionada == "lanzaguisante"
+                                and cant_soles >= 100
+                            ):
+                                if grilla[fila][columna] != 0:
+                                    continue
+                                else:
+                                    cant_soles -= 100
+                                    colocar_planta(
+                                        fila,
+                                        columna,
+                                        planta_seleccionada,
+                                        grilla,
+                                        lista_plantas,
+                                        cant_filas,
+                                        cant_columnas,
+                                        img_girasol,
+                                        img_lanzaguisante,
+                                        img_lanzaguisante_dispara,
+                                        img_nuez,
+                                        img_nuezmitad,
+                                        img_nuezdañada,
+                                        img_tralladora_dispara,
+                                    )
+                                    sonido_plantar.play()
+                                    planta_seleccionada = (
+                                        None  # Reinicia la planta seleccionada
+                                    )
     # Oleadas
     if puntuacion >= 40 and oleada_actual != 6:
         pesos = (0, 0.50, 0.50)
@@ -256,8 +346,6 @@ while jugando:
         else:
             mostrar_oleada = False
 
-
-
     ventana.fill(color_background)
 
     ventana.blit(img_fondo_grilla, (margen_cortadora, offset_y_grilla))
@@ -267,11 +355,10 @@ while jugando:
         x_piso = margen_cortadora + (9 * tamaño_celda)
         ventana.blit(img_piso, (x_piso, y))
 
-    
     for cortadora in lista_cortadoras:
         cortadora.movimiento()
         cortadora.dibujar(ventana, offset_y_grilla)
-            
+
         if cortadora.esta_activada():
             if not cortadora.ya_sono:
                 sonido_cortadora.play()
@@ -281,7 +368,6 @@ while jugando:
                 if cortadora.rect.colliderect(zombi):
                     lista_zombis.remove(zombi)
 
-            
     for planta in lista_plantas:
         planta.dibujar(ventana, offset_y_grilla)
         for zombi in lista_zombis:
@@ -295,7 +381,6 @@ while jugando:
                         lista_proyectiles.append(proyectil)
                         sonido_disparo.play()
 
-
     for guisante in lista_proyectiles:
         guisante.mover()
         guisante.dibujar(ventana, offset_y_grilla)
@@ -305,7 +390,12 @@ while jugando:
         for zombi in lista_zombis:
             if guisante.rect.colliderect(zombi.rect):
                 murio = zombi.recibedaño()
-                zombi.actualizar_imagen(img_zombie_normal, img_zombie_sin_brazo, img_zombie_cono_dañado, img_zombie_balde_dañado)
+                zombi.actualizar_imagen(
+                    img_zombie_normal,
+                    img_zombie_sin_brazo,
+                    img_zombie_cono_dañado,
+                    img_zombie_balde_dañado,
+                )
                 sonido_golpe.play()
                 if murio:
                     lista_zombis.remove(zombi)
@@ -342,7 +432,7 @@ while jugando:
 
     if tiempo_actual - tiempo_ultimo_sol >= intervalo_sol:
         tiempo_ultimo_sol = tiempo_actual
-        nueva_columna = random.randint(0, 9)
+        nueva_columna = random.uniform(1.0, 9.0)
         lista_soles.append(Soles(nueva_columna, 0, img_sol, "cielo", 75, 75))
 
     for sol in lista_soles:
@@ -362,7 +452,6 @@ while jugando:
                     planta.sol_activo = None
                     break
 
-
     img_sol_50 = pygame.transform.scale(img_sol, (50, 50))
     texto_sol = render_texto(f"Soles {cant_soles}", 30, AMARILLO)
     ventana.blit(texto_sol, (10, 10))
@@ -370,11 +459,11 @@ while jugando:
     for girasol in lista_plantas:
         if isinstance(girasol, Girasol):
             if girasol.puede_generar():
-                nuevo_sol = Soles(girasol.columna, girasol.fila, img_sol, "planta", 75, 75)
+                nuevo_sol = Soles(
+                    girasol.columna, girasol.fila, img_sol, "planta", 75, 75
+                )
                 lista_soles.append(nuevo_sol)
-                girasol.sol_activo = nuevo_sol  
-
-
+                girasol.sol_activo = nuevo_sol
 
     ventana.blit(img_sol_50, (35, barra_inferior_inicio + 142))
     texto_valor_GP = render_texto("50", 30, AMARILLO)
@@ -388,35 +477,42 @@ while jugando:
     ventana.blit(texto_valor_GP, (365, barra_inferior_inicio + 149))
 
     ventana.blit(texto_puntuacion, (700, barra_inferior_inicio + 142))
-    
-    
+
     texto_oleada = render_texto(f"Oleada {oleada_actual}", 30, NEGRO)
     ventana.blit(texto_oleada, (700, barra_inferior_inicio + 110))
 
-    
+    # Sonido
+    if sonido_muteado:
+        ventana.blit(img_mute, rect_mute.topleft)
+    else:
+        ventana.blit(img_unmute, rect_mute.topleft)
+    rect_mute = pygame.Rect(1000, 50, 50, 50)
+
     # Dibujar la oleada actual
     if mostrar_oleada:
         if pygame.time.get_ticks() - tiempo_mostrar_oleada < duracion_cartel:
             # Primero dibujamos el cartel de fondo
-            rect_cartel = img_cartel.get_rect(center=(ancho // 2, alto-offset_y_grilla // 2))
+            rect_cartel = img_cartel.get_rect(
+                center=(ancho // 2, alto - offset_y_grilla // 2)
+            )
             ventana.blit(img_cartel, rect_cartel)
 
             # Luego el texto por encima
             texto_oleada_central = render_texto(f"Oleada {oleada_actual}", 80, BLANCO)
-            rect_texto = texto_oleada_central.get_rect(center=(ancho // 2, alto-offset_y_grilla // 2))
+            rect_texto = texto_oleada_central.get_rect(
+                center=(ancho // 2, alto - offset_y_grilla // 2)
+            )
             ventana.blit(texto_oleada_central, rect_texto)
         else:
             mostrar_oleada = False
-            
+
     if pala_activa and planta_seleccionada == "pala":
         pos_mouse = pygame.mouse.get_pos()
-        ventana.blit(img_pala, (pos_mouse[0]-10, pos_mouse[1]-90))
-
-
+        ventana.blit(img_pala, (pos_mouse[0] - 10, pos_mouse[1] - 90))
 
     pygame.display.update()
 
-#pantalla de game over
+# pantalla de game over
 if vidas <= 0:
     sonido_principal.stop()
     sonido_mordida.stop()
@@ -430,9 +526,9 @@ if vidas <= 0:
                     game_over = False
         s = pygame.Surface((1000, 1000))
         s.set_alpha(128)
-        s.fill((0,0,0))
+        s.fill((0, 0, 0))
         imagen_final = cargar_imagen("Imagenes/pantallas/coso.png")
-        ventana.blit(s, (0,0))
+        ventana.blit(s, (0, 0))
         ventana.blit(imagen_final, (200, 100))
         pygame.display.flip()
         reloj.tick(FPS)

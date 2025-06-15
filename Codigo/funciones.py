@@ -36,7 +36,7 @@ def colocar_planta(
     img_nuez,
     img_nuezmitad,
     img_nuezdañada,
-    img_tralladora_dispara,
+    img_tralladora,
 ):
     if 0 <= fila < cant_filas + 1 and 0 <= columna < cant_columnas:
         if grilla[fila][columna] == 0:
@@ -53,7 +53,7 @@ def colocar_planta(
                 )
             elif planta_seleccionada == "lanzaguisanteTriple":
                 nueva_planta = LanzaguisantesTriple(
-                    fila, columna, img_lanzaguisante, img_tralladora_dispara
+                    fila, columna, img_tralladora, img_tralladora
                 )
             if nueva_planta is not None:
                 lista_plantas.append(nueva_planta)

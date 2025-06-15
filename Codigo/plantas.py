@@ -87,53 +87,47 @@ class Lanzaguisantes(Planta):
     def valor(self):
         self.valor = 100
 
-
 class LanzaguisantesTriple(Planta):
-
     def __init__(self, fila, columna, imagen, imagen_disparo):
         super().__init__(fila, columna, imagen, vida=6)
         self.imagen_normal = imagen
         self.imagen_disparo = imagen_disparo
-        self.estado = "normal"  # puede ser "normal" o "preparando"
-        self.tiempo_preparacion = 0.3  # segundos de preparación
-        self.ultimo_disparo = time.time()
-        self.inicio_preparacion = 0
-        self.proyectil_pendiente = False
+        self.estado = "normal"
+        self.cooldown = 5
+        self.ultimo_disparo = time.time() - self.cooldown  # arranca disponible
+        self.proyectiles_restantes = 0
+        self.tiempo_entre_proyectiles = 0.2
+        self.ultimo_proyectil_disparado = 0
 
     def puede_disparar(self):
-        return time.time() - self.ultimo_disparo >= 2 and self.estado == "normal"
+        return (time.time() - self.ultimo_disparo >= self.cooldown) and self.estado == "normal"
 
     def preparar_disparo(self):
-        self.estado = "preparando"
-        self.inicio_preparacion = time.time()
-        self.proyectil_pendiente = True
-
-    def actualizar_animacion(self):
-        if self.estado == "preparando":
-            if time.time() - self.inicio_preparacion >= self.tiempo_preparacion:
-                self.estado = "normal"
-                self.ultimo_disparo = time.time()
-                return True
-        return False
+        self.estado = "disparando"
+        self.proyectiles_restantes = 3
+        self.ultimo_proyectil_disparado = time.time()
 
     def disparar(self, img_proyectil):
-        # dispara tres bolas
-        proyectiles = [
-            Proyectiles(self.x + 60, self.y, img_proyectil),
-            Proyectiles(self.x + 70, self.y, img_proyectil),
-            Proyectiles(self.x + 80, self.y, img_proyectil),
-        ]
+        proyectiles = []
+        tiempo_actual = time.time()
+
+        if self.estado == "disparando":
+            if self.proyectiles_restantes > 0 and (tiempo_actual - self.ultimo_proyectil_disparado >= self.tiempo_entre_proyectiles):
+                proyectiles.append(Proyectiles(self.x + 60, self.y, img_proyectil))
+                self.proyectiles_restantes -= 1
+                self.ultimo_proyectil_disparado = tiempo_actual
+
+                if self.proyectiles_restantes == 0:
+                    self.estado = "normal"
+                    self.ultimo_disparo = time.time()
 
         return proyectiles
 
     def dibujar(self, ventana, offset_y=0):
-        if self.estado == "preparando":
+        if self.estado == "disparando":
             ventana.blit(self.imagen_disparo, (self.x, self.y + offset_y))
         else:
             ventana.blit(self.imagen_normal, (self.x, self.y + offset_y))
-
-    def valor(self):
-        self.valor = 100
 
 
 class Nuez(Planta):

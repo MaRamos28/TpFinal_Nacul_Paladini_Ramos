@@ -81,7 +81,6 @@ img_proyectil = cargar_imagen("Imagenes/Proyectil.png")
 img_sol = cargar_imagen("Imagenes/sol.png")
 img_pala = cargar_imagen("Imagenes/pala.png")
 img_cortadora = cargar_imagen("Imagenes/cortadora.png")
-img_cesped = cargar_imagen("Imagenes/cesped.png")
 img_piso = cargar_imagen("Imagenes/piso.png")
 img_fondo_grilla = cargar_imagen("Imagenes/imagenFondoGrilla.png", tamaño=(1000, 500))
 img_cartel = cargar_imagen("Imagenes/cartel.png", tamaño=(600, 300))
@@ -117,6 +116,7 @@ sonido_mordida = pygame.mixer.Sound("musica/efectos/mordida.mp3")
 sonido_plantar = pygame.mixer.Sound("musica/efectos/plantar.mp3")
 sonido_golpe = pygame.mixer.Sound("musica/efectos/golpe.mp3")
 sonido_zombi_inicio = pygame.mixer.Sound("musica/efectos/zombies_are_coming.mp3")
+
 sonido_principal.play(-1)
 sonido_principal.set_volume(0.4)
 sonido_zombi_inicio.play()
@@ -124,6 +124,7 @@ sonido_seleccionar = pygame.mixer.Sound("musica/efectos/seleccionar.mp3")
 sonido_disparo = pygame.mixer.Sound("musica/efectos/sonido disparo.mp3")
 sonido_sol = pygame.mixer.Sound("musica/efectos/sonido sol.mp3")
 sonido_cortadora = pygame.mixer.Sound("musica/efectos/cortadoraaa.mp3")
+
 
 jugando = True
 tiempo_ultimo_sol = 0
@@ -234,7 +235,7 @@ while jugando:
                                     continue
                                 else:
                                     cant_soles -= 50
-                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora)
+                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora, img_tralladora_dispara)
                                     sonido_plantar.play()
                                     planta_seleccionada = (None)  # Reinicia la planta seleccionada
 
@@ -246,7 +247,7 @@ while jugando:
                                     continue
                                 else:
                                     cant_soles -= 100
-                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora)
+                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora, img_tralladora_dispara)
                                     sonido_plantar.play()
                                     planta_seleccionada = (None)  # Reinicia la planta seleccionada
                                     
@@ -255,7 +256,7 @@ while jugando:
                                     continue
                                 else:
                                     cant_soles -= 200
-                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora)
+                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora, img_tralladora_dispara)
                                     sonido_plantar.play()
                                     planta_seleccionada = (None)  # Reinicia la planta seleccionada
 
@@ -339,8 +340,10 @@ while jugando:
 
     for planta in lista_plantas:
         planta.dibujar(ventana, offset_y_grilla)
+
         for zombi in lista_zombis:
             if planta.devolver_coords()[1] == zombi.devolver_coords()[1]:
+
                 if isinstance(planta, Lanzaguisantes):
                     if planta.puede_disparar():
                         planta.preparar_disparo()
@@ -349,11 +352,17 @@ while jugando:
                         proyectil = planta.disparar(img_proyectil)
                         lista_proyectiles.append(proyectil)
                         sonido_disparo.play()
+
                 elif isinstance(planta, LanzaguisantesTriple):
+                    if planta.puede_disparar():
+                        planta.preparar_disparo()
+
                     proyectiles = planta.disparar(img_proyectil)
                     for p in proyectiles:
                         lista_proyectiles.append(p)
-                    sonido_disparo.play()
+                        sonido_disparo.play()
+
+
 
     for guisante in lista_proyectiles:
         guisante.mover()

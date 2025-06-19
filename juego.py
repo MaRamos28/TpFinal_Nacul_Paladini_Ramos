@@ -1,6 +1,9 @@
 from funciones import *
 from plantas import *
 from cortadora import *
+from menu import *
+
+mostrar_menu()
 
 lista_zombis = []
 lista_plantas = []
@@ -38,7 +41,7 @@ barra_inferior_inicio = 0
 offset_y_grilla = barra_superior_tamaño + separacion_barra_grilla
 tiempo_entre_zombis = 10  # Segundos
 tiempo_ultimo_zombi = 0
-cant_soles = 5000
+cant_soles = 50000
 pygame.init()
 pygame.mixer.init()
 puntuacion = 0

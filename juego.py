@@ -227,7 +227,9 @@ while jugando:
                             if planta.fila == fila and planta.columna == columna:
                                 lista_plantas.remove(planta)
                                 grilla[fila][columna] = 0
-                                planta_seleccionada = (None)  # Reinicia la planta seleccionada
+                                planta_seleccionada = (
+                                    None  # Reinicia la planta seleccionada
+                                )
                     else:
                         if columna < 10:
                             if (
@@ -238,9 +240,27 @@ while jugando:
                                     continue
                                 else:
                                     cant_soles -= 50
-                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora, img_tralladora_dispara)
+                                    colocar_planta(
+                                        fila,
+                                        columna,
+                                        planta_seleccionada,
+                                        grilla,
+                                        lista_plantas,
+                                        cant_filas,
+                                        cant_columnas,
+                                        img_girasol,
+                                        img_lanzaguisante,
+                                        img_lanzaguisante_dispara,
+                                        img_nuez,
+                                        img_nuezmitad,
+                                        img_nuezdañada,
+                                        img_tralladora,
+                                        img_tralladora_dispara,
+                                    )
                                     sonido_plantar.play()
-                                    planta_seleccionada = (None)  # Reinicia la planta seleccionada
+                                    planta_seleccionada = (
+                                        None  # Reinicia la planta seleccionada
+                                    )
 
                             elif (
                                 planta_seleccionada == "lanzaguisante"
@@ -250,18 +270,57 @@ while jugando:
                                     continue
                                 else:
                                     cant_soles -= 100
-                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora, img_tralladora_dispara)
+                                    colocar_planta(
+                                        fila,
+                                        columna,
+                                        planta_seleccionada,
+                                        grilla,
+                                        lista_plantas,
+                                        cant_filas,
+                                        cant_columnas,
+                                        img_girasol,
+                                        img_lanzaguisante,
+                                        img_lanzaguisante_dispara,
+                                        img_nuez,
+                                        img_nuezmitad,
+                                        img_nuezdañada,
+                                        img_tralladora,
+                                        img_tralladora_dispara,
+                                    )
                                     sonido_plantar.play()
-                                    planta_seleccionada = (None)  # Reinicia la planta seleccionada
-                                    
-                            elif (planta_seleccionada == "lanzaguisanteTriple" and cant_soles >= 200):
+                                    planta_seleccionada = (
+                                        None  # Reinicia la planta seleccionada
+                                    )
+
+                            elif (
+                                planta_seleccionada == "lanzaguisanteTriple"
+                                and cant_soles >= 200
+                            ):
                                 if grilla[fila][columna] != 0:
                                     continue
                                 else:
                                     cant_soles -= 200
-                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora, img_tralladora_dispara)
+                                    colocar_planta(
+                                        fila,
+                                        columna,
+                                        planta_seleccionada,
+                                        grilla,
+                                        lista_plantas,
+                                        cant_filas,
+                                        cant_columnas,
+                                        img_girasol,
+                                        img_lanzaguisante,
+                                        img_lanzaguisante_dispara,
+                                        img_nuez,
+                                        img_nuezmitad,
+                                        img_nuezdañada,
+                                        img_tralladora,
+                                        img_tralladora_dispara,
+                                    )
                                     sonido_plantar.play()
-                                    planta_seleccionada = (None)  # Reinicia la planta seleccionada
+                                    planta_seleccionada = (
+                                        None  # Reinicia la planta seleccionada
+                                    )
 
     # Oleadas
     if puntuacion >= 40 and oleada_actual != 6:
@@ -364,8 +423,6 @@ while jugando:
                     for p in proyectiles:
                         lista_proyectiles.append(p)
                         sonido_disparo.play()
-
-
 
     for guisante in lista_proyectiles:
         guisante.mover()

@@ -19,7 +19,7 @@ class Zombie:
         self.fila = random.randint(0, 4)
         self.x = 1010
         self.y = self.fila * tamaño_celda
-        self.velocidad = 0.25 
+        self.velocidad = 0.25  
         self.daño = 1
         self.tipo = tipo
         self.imagen = imagen

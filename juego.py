@@ -53,7 +53,7 @@ tiempo_pausa = 4000  # 4 segundos
 
 barra_inferior_inicio = 0
 offset_y_grilla = barra_superior_tamaño + separacion_barra_grilla
-tiempo_entre_zombis = 15  # Segundos
+tiempo_entre_zombis = 15 # Segundos
 tiempo_ultimo_zombi = 0
 puntuacion = 0
 
@@ -185,95 +185,96 @@ while jugando:
                 planta_seleccionada = None
 
         if evento.type == pygame.MOUSEBUTTONDOWN:
-            x, y = pygame.mouse.get_pos()
-            sol_agarrado = False  # inicializo bandera
+            if evento.button == 1:
+                x, y = pygame.mouse.get_pos()
+                sol_agarrado = False  # inicializo bandera
 
             # sonido mute
-            if rect_mute.collidepoint(x, y):
-                sonido_muteado = not sonido_muteado
-                print("muteado:", sonido_muteado)
-                if sonido_muteado:
+                if rect_mute.collidepoint(x, y):
+                    sonido_muteado = not sonido_muteado
+                    print("muteado:", sonido_muteado)
+                    if sonido_muteado:
 
-                    nuevo_volumen = 0.0
-                else:
-                    nuevo_volumen = volumen_original
-
-                sonido_principal.set_volume(nuevo_volumen)
-                sonido_mordida.set_volume(nuevo_volumen)
-                sonido_plantar.set_volume(nuevo_volumen)
-                sonido_golpe.set_volume(nuevo_volumen)
-                sonido_zombi_inicio.set_volume(nuevo_volumen)
-                sonido_seleccionar.set_volume(nuevo_volumen)
-                sonido_disparo.set_volume(nuevo_volumen)
-                sonido_sol.set_volume(nuevo_volumen)
-                sonido_cortadora.set_volume(nuevo_volumen)
-
-            for sol in lista_soles[:]:
-                if sol.agarrar_sol(x, y, offset_y_grilla):
-                    lista_soles.remove(sol)
-                    cant_soles += 25
-                    sonido_sol.play()
-
-                    for planta in lista_plantas:
-                        if isinstance(planta, Girasol) and planta.sol_activo == sol:
-                            planta.tiempo_ultimo_sol = time.time()
-                            planta.sol_activo = None
-                            break
-
-                    sol_agarrado = True
-                    break
-
-            if not sol_agarrado:
-                if y < barra_superior_tamaño:
-                    for nombre, imagen, rect in plantas_disponibles:
-                        if rect.collidepoint(x, y):
-                            planta_seleccionada = nombre
-                            print(f"Planta seleccionada: {planta_seleccionada}")
-                            sonido_seleccionar.play()
-
-                            if planta_seleccionada == "pala":
-                                pala_activa = True
-                            else:
-                                pala_activa = False
-                
-
-                elif y >= offset_y_grilla and x >= margen_cortadora:
-                    fila = (y - offset_y_grilla) // tamaño_celda
-                    columna = x // tamaño_celda
-
-                    if planta_seleccionada == "pala":
-                        for planta in lista_plantas:
-                            if planta.fila == fila and planta.columna == columna:
-                                lista_plantas.remove(planta)
-                                grilla[fila][columna] = 0
-                                planta_seleccionada = None
+                        nuevo_volumen = 0.0
                     else:
-                        if columna < 10 and grilla[fila][columna] == 0:
-                            tiempo_actual = time.time()
-                            ultimo_tiempo = cooldowns_plantas.get(planta_seleccionada, 0)
-                            cooldown = duracion_cooldown.get(planta_seleccionada, 0)
+                        nuevo_volumen = volumen_original
 
-                            if tiempo_actual - ultimo_tiempo >= cooldown:
-                                # Verificamos cantidad soles y colocamos según planta
-                                if planta_seleccionada == "girasol" and cant_soles >= 50:
-                                    cant_soles -= 50
-                                elif planta_seleccionada == "nuez" and cant_soles >= 50:
-                                    cant_soles -= 50
-                                elif planta_seleccionada == "lanzaguisante" and cant_soles >= 100:
-                                    cant_soles -= 100
-                                elif planta_seleccionada == "lanzaguisanteTriple" and cant_soles >= 200:
-                                    cant_soles -= 200
+                    sonido_principal.set_volume(nuevo_volumen)
+                    sonido_mordida.set_volume(nuevo_volumen)
+                    sonido_plantar.set_volume(nuevo_volumen)
+                    sonido_golpe.set_volume(nuevo_volumen)
+                    sonido_zombi_inicio.set_volume(nuevo_volumen)
+                    sonido_seleccionar.set_volume(nuevo_volumen)
+                    sonido_disparo.set_volume(nuevo_volumen)
+                    sonido_sol.set_volume(nuevo_volumen)
+                    sonido_cortadora.set_volume(nuevo_volumen)
+
+                for sol in lista_soles[:]:
+                    if sol.agarrar_sol(x, y, offset_y_grilla):
+                        lista_soles.remove(sol)
+                        cant_soles += 25
+                        sonido_sol.play()
+
+                        for planta in lista_plantas:
+                            if isinstance(planta, Girasol) and planta.sol_activo == sol:
+                                planta.tiempo_ultimo_sol = time.time()
+                                planta.sol_activo = None
+                                break
+
+                        sol_agarrado = True
+                        break
+
+                if not sol_agarrado:
+                    if y < barra_superior_tamaño:
+                        for nombre, imagen, rect in plantas_disponibles:
+                            if rect.collidepoint(x, y):
+                                planta_seleccionada = nombre
+                                print(f"Planta seleccionada: {planta_seleccionada}")
+                                sonido_seleccionar.play()
+
+                                if planta_seleccionada == "pala":
+                                    pala_activa = True
+                                else:
+                                    pala_activa = False
+                    
+
+                    elif y >= offset_y_grilla and x >= margen_cortadora:
+                        fila = (y - offset_y_grilla) // tamaño_celda
+                        columna = x // tamaño_celda
+
+                        if planta_seleccionada == "pala":
+                            for planta in lista_plantas:
+                                if planta.fila == fila and planta.columna == columna:
+                                    lista_plantas.remove(planta)
+                                    grilla[fila][columna] = 0
+                                    planta_seleccionada = None
+                        else:
+                            if columna < 10 and grilla[fila][columna] == 0:
+                                tiempo_actual = time.time()
+                                ultimo_tiempo = cooldowns_plantas.get(planta_seleccionada, 0)
+                                cooldown = duracion_cooldown.get(planta_seleccionada, 0)
+
+                                if tiempo_actual - ultimo_tiempo >= cooldown:
+                                    # Verificamos cantidad soles y colocamos según planta
+                                    if planta_seleccionada == "girasol" and cant_soles >= 50:
+                                        cant_soles -= 50
+                                    elif planta_seleccionada == "nuez" and cant_soles >= 50:
+                                        cant_soles -= 50
+                                    elif planta_seleccionada == "lanzaguisante" and cant_soles >= 100:
+                                        cant_soles -= 100
+                                    elif planta_seleccionada == "lanzaguisanteTriple" and cant_soles >= 200:
+                                        cant_soles -= 200
+                                    else:
+                                        planta_seleccionada = None
+                                        break  # No tenés suficientes soles, no se planta
+
+                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora, img_tralladora_dispara)
+                                    sonido_plantar.play()
+                                    cooldowns_plantas[planta_seleccionada] = tiempo_actual
+                                    planta_seleccionada = None
                                 else:
                                     planta_seleccionada = None
-                                    break  # No tenés suficientes soles, no se planta
-
-                                colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora, img_tralladora_dispara)
-                                sonido_plantar.play()
-                                cooldowns_plantas[planta_seleccionada] = tiempo_actual
-                                planta_seleccionada = None
-                            else:
-                                planta_seleccionada = None
-                                print("Todavía está en cooldown esa planta.")
+                                    print("Todavía está en cooldown esa planta.")
 
                 
 
@@ -451,9 +452,9 @@ while jugando:
                 if cortadora.rect.colliderect(zombi):
                     lista_zombis.remove(zombi)
 
-            elif (zombi.x < margen_cortadora-50):
+            elif (zombi.x < margen_cortadora-30):
                 jugando = False
-                vidas = 0
+                game_over = True
                      
     for efecto in lista_efectos[:]:
         efecto.dibujar(ventana)
@@ -579,24 +580,24 @@ while jugando:
     pygame.display.update()
 
 # pantalla de game over
-if vidas <= 0:
-    sonido_principal.stop()
-    sonido_mordida.stop()
-    game_over = True
-    while game_over:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game_over = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    game_over = False
-        s = pygame.Surface((1000, 1000))
-        s.set_alpha(128)
-        s.fill((0, 0, 0))
-        imagen_final = cargar_imagen("Imagenes/pantallas/coso.png")
-        ventana.blit(s, (0, 0))
-        ventana.blit(imagen_final, (200, 100))
-        pygame.display.flip()
-        reloj.tick(FPS)
+# if vidas <= 0:
+#     sonido_principal.stop()
+#     sonido_mordida.stop()
+#     game_over = True
+#     while game_over:
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 game_over = False
+#             if event.type == pygame.KEYDOWN:
+#                 if event.key == pygame.K_RETURN:
+#                     game_over = False
+#         s = pygame.Surface((1000, 1000))
+#         s.set_alpha(128)
+#         s.fill((0, 0, 0))
+#         imagen_final = cargar_imagen("Imagenes/pantallas/coso.png", (1100, 900))
+#         ventana.blit(s, (0, 0))
+#         ventana.blit(imagen_final, (200, 100))
+#         pygame.display.flip()
+#         reloj.tick(FPS)
 
 pygame.quit()

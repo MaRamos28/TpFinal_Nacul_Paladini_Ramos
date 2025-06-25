@@ -1,3 +1,4 @@
+# Immportamos las librerías necesarias
 from funciones import cargar_imagen, render_texto, generar_zombi, colocar_planta
 from plantas import Girasol, Lanzaguisantes, LanzaguisantesTriple, Nuez, Proyectiles
 from soles import Soles
@@ -9,9 +10,12 @@ import pygame
 import time
 import random
 
-
+# Inicializamos Pygame, el reproductor de musica y mostramos el menú
+pygame.init()
+pygame.mixer.init()
 mostrar_menu()
 
+#Creamos las listas para almacenar los objetos del juego
 lista_zombis = []
 lista_plantas = []
 lista_proyectiles = []
@@ -19,6 +23,7 @@ lista_soles = []
 lista_cortadoras = []
 lista_efectos = []
 
+# Variables del juego
 cant_filas = 5
 cant_columnas = 10
 tamaño_celda = 100
@@ -31,12 +36,13 @@ separacion_barra_grilla = 10
 x = 0
 y = 0
 vidas = 5
+cant_soles = 50
 tiempo_invulnerabilidad = 2000
 es_vulnerable = False
 
 pala_activa = False
 
-oleada_actual = 1  # arranca en 1, para que la primera vez entre
+oleada_actual = 1
 mostrar_oleada = False
 tiempo_mostrar_oleada = 0
 duracion_cartel = 3000  # en milisegundos (3 segundos)
@@ -47,11 +53,8 @@ tiempo_pausa = 4000  # 4 segundos
 
 barra_inferior_inicio = 0
 offset_y_grilla = barra_superior_tamaño + separacion_barra_grilla
-tiempo_entre_zombis = 10  # Segundos
+tiempo_entre_zombis = 15  # Segundos
 tiempo_ultimo_zombi = 0
-cant_soles = 50000
-pygame.init()
-pygame.mixer.init()
 puntuacion = 0
 
 tamaño_ventana = (ancho, alto + barra_superior_tamaño + separacion_barra_grilla)
@@ -125,7 +128,7 @@ duracion_cooldown = {
 }
 
 zombis_disponibles = ("normal", "cono", "balde")
-pesos = (0.7, 0.2, 0.1)
+pesos = (1, 0, 0)
 
 
 # Sonidos
@@ -145,7 +148,7 @@ sonido_cortadora = pygame.mixer.Sound("musica/efectos/cortadoraaa.mp3")
 
 
 jugando = True
-tiempo_ultimo_sol = 0
+tiempo_ultimo_sol = time.time()
 intervalo_sol = 5
 
 # sonido
@@ -261,35 +264,31 @@ while jugando:
                                 elif planta_seleccionada == "lanzaguisanteTriple" and cant_soles >= 200:
                                     cant_soles -= 200
                                 else:
+                                    planta_seleccionada = None
                                     break  # No tenés suficientes soles, no se planta
 
-                                colocar_planta(
-                                    fila,
-                                    columna,
-                                    planta_seleccionada,
-                                    grilla,
-                                    lista_plantas,
-                                    cant_filas,
-                                    cant_columnas,
-                                    img_girasol,
-                                    img_lanzaguisante,
-                                    img_lanzaguisante_dispara,
-                                    img_nuez,
-                                    img_nuezmitad,
-                                    img_nuezdañada,
-                                    img_tralladora,
-                                    img_tralladora_dispara,
-                                )
+                                colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora, img_tralladora_dispara)
                                 sonido_plantar.play()
                                 cooldowns_plantas[planta_seleccionada] = tiempo_actual
                                 planta_seleccionada = None
                             else:
+                                planta_seleccionada = None
                                 print("Todavía está en cooldown esa planta.")
 
                 
 
     # Oleadas
-    if puntuacion >= 40 and oleada_actual != 6:
+    if puntuacion >=50 and oleada_actual !=7:
+        pesos = (0, 0.25, 0.75)
+        tiempo_entre_zombis = 2
+        oleada_actual = 7
+        mostrar_oleada = True
+        tiempo_mostrar_oleada = pygame.time.get_ticks()
+        pausar_generacion_zombis = True
+        tiempo_reinicio = pygame.time.get_ticks()
+
+    
+    elif puntuacion >= 40 and oleada_actual != 6:
         pesos = (0, 0.50, 0.50)
         tiempo_entre_zombis = 3
         oleada_actual = 6
@@ -327,13 +326,13 @@ while jugando:
 
     elif puntuacion >= 5 and puntuacion < 10 and oleada_actual != 2:
         pesos = (0.6, 0.25, 0.15)
-        tiempo_entre_zombis = 5
+        tiempo_entre_zombis = 10
         oleada_actual = 2
         mostrar_oleada = True
         tiempo_mostrar_oleada = pygame.time.get_ticks()
         pausar_generacion_zombis = True
         tiempo_reinicio = pygame.time.get_ticks()
-
+    
     if mostrar_oleada:
         tiempo_actual = pygame.time.get_ticks()
         if tiempo_actual - tiempo_mostrar_oleada < duracion_cartel:
@@ -369,22 +368,30 @@ while jugando:
     for planta in lista_plantas:
         planta.dibujar(ventana, offset_y_grilla)
 
-        for zombi in lista_zombis:
-            if planta.devolver_coords()[1] == zombi.devolver_coords()[1]:
+        # Chequear si hay zombis en la misma fila
+        hay_zombi_en_fila = any(zombi.devolver_coords()[1] == planta.devolver_coords()[1] for zombi in lista_zombis)
 
-                if isinstance(planta, Lanzaguisantes):
-                    if planta.puede_disparar():
-                        planta.preparar_disparo()
+        if isinstance(planta, Lanzaguisantes):
+            if hay_zombi_en_fila and planta.puede_disparar():
+                planta.preparar_disparo()
 
-                elif isinstance(planta, LanzaguisantesTriple):
-                    if planta.puede_disparar():
-                        planta.preparar_disparo()
-                        
+            if planta.actualizar_animacion():
+                proyectil = planta.disparar(img_proyectil)
+                lista_proyectiles.append(proyectil)
+                sonido_disparo.play()
 
-                    proyectiles = planta.disparar(img_proyectil)
-                    for p in proyectiles:
-                        lista_proyectiles.append(p)
-                        sonido_disparo.play()
+        elif isinstance(planta, LanzaguisantesTriple):
+            if not hay_zombi_en_fila:
+                planta.dejar_de_disparar()
+
+            if hay_zombi_en_fila and planta.puede_disparar():
+                planta.preparar_disparo()
+
+            proyectiles = planta.disparar(img_proyectil)
+            for p in proyectiles:
+                lista_proyectiles.append(p)
+                sonido_disparo.play()
+
                         
             if isinstance(planta, Lanzaguisantes):
                 if planta.actualizar_animacion():
@@ -436,12 +443,18 @@ while jugando:
         if not choco:
             zombi.mover()
         zombi.dibujar(ventana, offset_y_grilla)
+        
+        
         for cortadora in lista_cortadoras:
             if zombi.rect.colliderect(cortadora):
                 cortadora.activar()
                 if cortadora.rect.colliderect(zombi):
                     lista_zombis.remove(zombi)
-                    
+
+            elif (zombi.x < margen_cortadora-50):
+                jugando = False
+                vidas = 0
+                     
     for efecto in lista_efectos[:]:
         efecto.dibujar(ventana)
         if efecto.expiro():

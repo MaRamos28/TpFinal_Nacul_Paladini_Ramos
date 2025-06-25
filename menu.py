@@ -4,7 +4,7 @@ import webbrowser
 
 # Inicializamos Pygame
 pygame.init()
-
+pygame.mixer.init()
 # Dimensiones
 ANCHO = 1152
 ALTO = 768
@@ -37,11 +37,11 @@ def mostrar_menu():
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 x, y = evento.pos
                 if rect_start.collidepoint(x, y):
-                    return  # Salimos del menú para arrancar el juego
+                    return 
                 elif rect_tutorial.collidepoint(x, y):
                     webbrowser.open(
                         "https://www.youtube.com/"
-                    )  # Poné acá tu link cuando tengas el video
+                    )  
                 elif rect_exit.collidepoint(x, y):
                     pygame.quit()
                     sys.exit()

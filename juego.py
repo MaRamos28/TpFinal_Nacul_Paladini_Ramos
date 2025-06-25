@@ -183,7 +183,7 @@ while jugando:
 
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
-            sol_agarrado = False  # NUEVO: inicializo bandera
+            sol_agarrado = False  # inicializo bandera
 
             # sonido mute
             if rect_mute.collidepoint(x, y):
@@ -251,7 +251,7 @@ while jugando:
                             cooldown = duracion_cooldown.get(planta_seleccionada, 0)
 
                             if tiempo_actual - ultimo_tiempo >= cooldown:
-                                # Verificamos soles y colocamos según planta
+                                # Verificamos cantidad soles y colocamos según planta
                                 if planta_seleccionada == "girasol" and cant_soles >= 50:
                                     cant_soles -= 50
                                 elif planta_seleccionada == "nuez" and cant_soles >= 50:
@@ -473,23 +473,6 @@ while jugando:
             if nombre == planta_seleccionada:
                 pygame.draw.rect(ventana, (255, 0, 0), rect, 3)
 
-        
-        # Bordes rojos si está seleccionada
-        color_borde = (255, 0, 0) if nombre == planta_seleccionada else (0, 0, 0)
-        pygame.draw.rect(ventana, color_borde, rect, 2)
-
-        # Cooldown (barra gris)
-        if nombre in cooldowns_plantas:
-            tiempo_pasado = time.time() - cooldowns_plantas[nombre]
-            tiempo_total = duracion_cooldown[nombre]
-            if tiempo_pasado < tiempo_total:
-                altura_total = rect.height
-                fraccion = 1 - (tiempo_pasado / tiempo_total)
-                altura_barra = int(altura_total * fraccion)
-                barra_rect = pygame.Rect(rect.left, rect.top, rect.width, altura_barra)
-                pygame.draw.rect(ventana, (120, 120, 120), barra_rect)
-
-
     if tiempo_actual - tiempo_ultimo_sol >= intervalo_sol:
         tiempo_ultimo_sol = tiempo_actual
         nueva_columna = random.uniform(1.0, 9.0)
@@ -525,27 +508,25 @@ while jugando:
                 lista_soles.append(nuevo_sol)
                 girasol.sol_activo = nuevo_sol
 
-    # Girasol - 50
+    # Girasol vale 50
     ventana.blit(img_sol_50, (35, barra_inferior_inicio + 142))
     texto_valor_GP = render_texto("50", 30, AMARILLO)
     ventana.blit(texto_valor_GP, (90, barra_inferior_inicio + 152))
 
-    # Lanzaguisante - 100
+    # Lanzaguisante vale 100
     ventana.blit(img_sol_50, (165, barra_inferior_inicio + 142))
     texto_valor_L = render_texto("100", 30, AMARILLO)
     ventana.blit(texto_valor_L, (210, barra_inferior_inicio + 152))
 
-    # Nuez - 50
+    # Nuez vale 50
     ventana.blit(img_sol_50, (315, barra_inferior_inicio + 142))
     ventana.blit(texto_valor_GP, (365, barra_inferior_inicio + 152))
 
-    # Lanzaguisante triple - 200
+    # Lanzaguisante triple vale 200
     ventana.blit(img_sol_50, (470, barra_inferior_inicio + 142))
     texto_valor_T = render_texto("200", 30, AMARILLO)
     ventana.blit(texto_valor_T, (515, barra_inferior_inicio + 152))
 
-    
-    
     texto_puntuacion = render_texto(f"Puntuacion {puntuacion}", 30, NEGRO)
     
     ventana.blit(texto_puntuacion, (ancho - 250, 140))

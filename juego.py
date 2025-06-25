@@ -1,7 +1,14 @@
-from funciones import *
-from plantas import *
-from cortadora import *
-from menu import *
+from funciones import cargar_imagen, render_texto, generar_zombi, colocar_planta
+from plantas import Girasol, Lanzaguisantes, LanzaguisantesTriple, Nuez, Proyectiles
+from soles import Soles
+from zombies import Zombie
+from cortadora import cortadora
+from menu import mostrar_menu
+from EfectoGolpe import EfectoGolpe
+import pygame
+import time
+import random
+
 
 mostrar_menu()
 
@@ -10,6 +17,7 @@ lista_plantas = []
 lista_proyectiles = []
 lista_soles = []
 lista_cortadoras = []
+lista_efectos = []
 
 cant_filas = 5
 cant_columnas = 10
@@ -41,7 +49,7 @@ barra_inferior_inicio = 0
 offset_y_grilla = barra_superior_tamaño + separacion_barra_grilla
 tiempo_entre_zombis = 10  # Segundos
 tiempo_ultimo_zombi = 0
-cant_soles = 50
+cant_soles = 50000
 pygame.init()
 pygame.mixer.init()
 puntuacion = 0
@@ -92,6 +100,7 @@ img_unmute = cargar_imagen("Imagenes/unmute.png", tamaño=(50, 50))
 rect_mute = pygame.Rect(1000, 50, 50, 50)
 img_tralladora = cargar_imagen("imagenes/GuisantralladoraPvz1.png")
 img_tralladora_dispara = cargar_imagen("imagenes/tralladoraDispara.png")
+img_impacto = cargar_imagen("Imagenes/impacto.png", tamaño=(40, 40))
 
 plantas_disponibles = [
     ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
@@ -107,25 +116,13 @@ cooldowns_plantas = {
     "lanzaguisanteTriple": 0,
     "nuez": 0
 }
-duracion_cooldown = {
-    "girasol": 3,
-    "lanzaguisante": 4,
-    "lanzaguisanteTriple": 6,
-    "nuez": 5
-}
-cooldowns_plantas = {
-    "girasol": 0,
-    "lanzaguisante": 0,
-    "lanzaguisanteTriple": 0,
-    "nuez": 0
-}
-duracion_cooldown = {
-    "girasol": 3,
-    "lanzaguisante": 4,
-    "lanzaguisanteTriple": 6,
-    "nuez": 5
-}
 
+duracion_cooldown = {
+    "girasol": 3,
+    "lanzaguisante": 4,
+    "lanzaguisanteTriple": 6,
+    "nuez": 5
+}
 
 zombis_disponibles = ("normal", "cono", "balde")
 pesos = (0.7, 0.2, 0.1)
@@ -379,19 +376,23 @@ while jugando:
                     if planta.puede_disparar():
                         planta.preparar_disparo()
 
-                    if planta.actualizar_animacion():
-                        proyectil = planta.disparar(img_proyectil)
-                        lista_proyectiles.append(proyectil)
-                        sonido_disparo.play()
-
                 elif isinstance(planta, LanzaguisantesTriple):
                     if planta.puede_disparar():
                         planta.preparar_disparo()
+                        
 
                     proyectiles = planta.disparar(img_proyectil)
                     for p in proyectiles:
                         lista_proyectiles.append(p)
                         sonido_disparo.play()
+                        
+            if isinstance(planta, Lanzaguisantes):
+                if planta.actualizar_animacion():
+                    proyectil = planta.disparar(img_proyectil)
+                    lista_proyectiles.append(proyectil)
+                    sonido_disparo.play()
+                    
+
 
     for guisante in lista_proyectiles:
         guisante.mover()
@@ -408,25 +409,30 @@ while jugando:
                     img_zombie_cono_dañado,
                     img_zombie_balde_dañado,
                 )
-                sonido_golpe.play()
                 if murio:
                     lista_zombis.remove(zombi)
                     puntuacion += 1
                 if guisante in lista_proyectiles:
+                    sonido_golpe.play()
+                    efecto = EfectoGolpe(zombi.rect.centerx, zombi.rect.centery, img_impacto)
+                    lista_efectos.append(efecto)
                     lista_proyectiles.remove(guisante)
-
+                    
     for zombi in lista_zombis:
         choco = False
+        fila_zombi = zombi.y // tamaño_celda
+        col_zombi = zombi.x // tamaño_celda
         for planta in lista_plantas:
-            if zombi.rect.colliderect(planta.rect):
-                choco = True
-                if zombi.ataque():
-                    murio = planta.recibedaño()
-                    sonido_mordida.play()
-                    if murio:
-                        lista_plantas.remove(planta)
-                        grilla[planta.fila][planta.columna] = 0
-                break
+            if fila_zombi == planta.fila and col_zombi == planta.columna:
+                if zombi.rect.colliderect(planta.rect):
+                    choco = True
+                    if zombi.ataque():
+                        murio = planta.recibedaño()
+                        sonido_mordida.play()
+                        if murio:
+                            lista_plantas.remove(planta)
+                            grilla[planta.fila][planta.columna] = 0
+                    break
         if not choco:
             zombi.mover()
         zombi.dibujar(ventana, offset_y_grilla)
@@ -435,6 +441,11 @@ while jugando:
                 cortadora.activar()
                 if cortadora.rect.colliderect(zombi):
                     lista_zombis.remove(zombi)
+                    
+    for efecto in lista_efectos[:]:
+        efecto.dibujar(ventana)
+        if efecto.expiro():
+            lista_efectos.remove(efecto)
 
     for nombre, imagen, rect in plantas_disponibles:
         for nombre, imagen, rect in plantas_disponibles:

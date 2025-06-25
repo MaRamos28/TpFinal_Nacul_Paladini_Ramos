@@ -83,6 +83,7 @@ class Lanzaguisantes(Planta):
             ventana.blit(self.imagen_disparo, (self.x, self.y + offset_y))
         else:
             ventana.blit(self.imagen_normal, (self.x, self.y + offset_y))
+        self.rect.topleft = (self.x, self.y + offset_y)  # ← actualizar rect
 
     def valor(self):
         self.valor = 100
@@ -128,6 +129,8 @@ class LanzaguisantesTriple(Planta):
             ventana.blit(self.imagen_disparo, (self.x, self.y + offset_y))
         else:
             ventana.blit(self.imagen_normal, (self.x, self.y + offset_y))
+        self.rect.topleft = (self.x, self.y + offset_y)  # ← también acá
+
 
 
 class Nuez(Planta):

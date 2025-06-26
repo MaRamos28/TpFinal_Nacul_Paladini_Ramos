@@ -104,9 +104,7 @@ rect_mute = pygame.Rect(1000, 50, 50, 50)
 img_tralladora = cargar_imagen("imagenes/GuisantralladoraPvz1.png")
 img_tralladora_dispara = cargar_imagen("imagenes/tralladoraDispara.png")
 img_impacto = cargar_imagen("Imagenes/impacto.png", tamaño=(40, 40))
-img_game_over = cargar_imagen(
-    "Imagenes/pantallas/pantalla_final.png", tamaño=tamaño_ventana
-)
+img_game_over = cargar_imagen("Imagenes/pantallas/pantalla_final.png", tamaño=tamaño_ventana)
 
 plantas_disponibles = [
     ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
@@ -148,7 +146,7 @@ sonido_mordida = pygame.mixer.Sound("musica/efectos/mordida.mp3")
 sonido_plantar = pygame.mixer.Sound("musica/efectos/plantar.mp3")
 sonido_golpe = pygame.mixer.Sound("musica/efectos/golpe.mp3")
 sonido_zombi_inicio = pygame.mixer.Sound("musica/efectos/zombies_are_coming.mp3")
-
+sonido_game_over = pygame.mixer.Sound("musica/sonido game over.mp3")
 sonido_principal.play(-1)
 sonido_principal.set_volume(0.4)
 sonido_zombi_inicio.play()
@@ -630,28 +628,23 @@ while jugando:
     pygame.display.update()
 
 # pantalla de game over
+rect_exit_to_map = pygame.Rect(280, 600, 200, 50)
+rect_retry = pygame.Rect(680, 600, 125, 50)
 if game_over:
-    # sonido_principal.stop()
-    # sonido_mordida.stop()
+    sonido_principal.stop()
+    sonido_mordida.stop()
+    sonido_game_over.play()
     while True:
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()
-
+                
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     pygame.quit()
-                    sys.exit()
-        ventana.fill((0, 0, 0))
+                    ventana.fill((0, 0, 0))
         ventana.blit(img_game_over, (0, 0))
-
-        # s.fill((0, 0, 0))
-        # ventana.blit(s, (0, 0))
-        # ventana.blit(img_game_over, (200, 100))
-        texto_salida = render_texto("Presioná ENTER para salir", 40, (255, 255, 255))
-        rect_texto = texto_salida.get_rect(center=(ancho // 2, alto - 50))
-        ventana.blit(texto_salida, rect_texto)
 
         pygame.display.flip()
         reloj.tick(FPS)

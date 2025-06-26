@@ -15,7 +15,7 @@ pygame.init()
 pygame.mixer.init()
 mostrar_menu()
 
-#Creamos las listas para almacenar los objetos del juego
+# Creamos las listas para almacenar los objetos del juego
 lista_zombis = []
 lista_plantas = []
 lista_proyectiles = []
@@ -53,7 +53,7 @@ tiempo_pausa = 4000  # 4 segundos
 
 barra_inferior_inicio = 0
 offset_y_grilla = barra_superior_tamaño + separacion_barra_grilla
-tiempo_entre_zombis = 15 # Segundos
+tiempo_entre_zombis = 1  # Segundos
 tiempo_ultimo_zombi = 0
 puntuacion = 0
 
@@ -104,12 +104,23 @@ rect_mute = pygame.Rect(1000, 50, 50, 50)
 img_tralladora = cargar_imagen("imagenes/GuisantralladoraPvz1.png")
 img_tralladora_dispara = cargar_imagen("imagenes/tralladoraDispara.png")
 img_impacto = cargar_imagen("Imagenes/impacto.png", tamaño=(40, 40))
+img_game_over = cargar_imagen(
+    "Imagenes/pantallas/pantalla_final.png", tamaño=tamaño_ventana
+)
 
 plantas_disponibles = [
     ("girasol", img_girasol, pygame.Rect(50, barra_inferior_inicio + 50, 100, 100)),
-    ("lanzaguisante", img_lanzaguisante, pygame.Rect(200, barra_inferior_inicio + 50, 100, 100)),
+    (
+        "lanzaguisante",
+        img_lanzaguisante,
+        pygame.Rect(200, barra_inferior_inicio + 50, 100, 100),
+    ),
     ("nuez", img_nuez, pygame.Rect(350, barra_inferior_inicio + 50, 100, 100)),
-    ("lanzaguisanteTriple", img_tralladora, pygame.Rect(500, barra_inferior_inicio + 50, 100, 100)),
+    (
+        "lanzaguisanteTriple",
+        img_tralladora,
+        pygame.Rect(500, barra_inferior_inicio + 50, 100, 100),
+    ),
     ("pala", img_pala, pygame.Rect(650, barra_inferior_inicio + 50, 100, 100)),
 ]
 
@@ -117,14 +128,14 @@ cooldowns_plantas = {
     "girasol": 0,
     "lanzaguisante": 0,
     "lanzaguisanteTriple": 0,
-    "nuez": 0
+    "nuez": 0,
 }
 
 duracion_cooldown = {
     "girasol": 3,
     "lanzaguisante": 4,
     "lanzaguisanteTriple": 6,
-    "nuez": 5
+    "nuez": 5,
 }
 
 zombis_disponibles = ("normal", "cono", "balde")
@@ -148,6 +159,8 @@ sonido_cortadora = pygame.mixer.Sound("musica/efectos/cortadoraaa.mp3")
 
 
 jugando = True
+game_over = False
+
 tiempo_ultimo_sol = time.time()
 intervalo_sol = 5
 
@@ -189,15 +202,17 @@ while jugando:
                 x, y = pygame.mouse.get_pos()
                 sol_agarrado = False  # inicializo bandera
 
-            # sonido mute
+                # sonido mute
                 if rect_mute.collidepoint(x, y):
                     sonido_muteado = not sonido_muteado
                     print("muteado:", sonido_muteado)
-                    if sonido_muteado:
-
-                        nuevo_volumen = 0.0
-                    else:
-                        nuevo_volumen = volumen_original
+                    if jugando:
+                        if sonido_muteado:
+                            ventana.blit(img_mute, rect_mute.topleft)
+                            nuevo_volumen = 0.0
+                        else:
+                            ventana.blit(img_unmute, rect_mute.topleft)
+                            nuevo_volumen = volumen_original
 
                     sonido_principal.set_volume(nuevo_volumen)
                     sonido_mordida.set_volume(nuevo_volumen)
@@ -236,7 +251,6 @@ while jugando:
                                     pala_activa = True
                                 else:
                                     pala_activa = False
-                    
 
                     elif y >= offset_y_grilla and x >= margen_cortadora:
                         fila = (y - offset_y_grilla) // tamaño_celda
@@ -251,35 +265,65 @@ while jugando:
                         else:
                             if columna < 10 and grilla[fila][columna] == 0:
                                 tiempo_actual = time.time()
-                                ultimo_tiempo = cooldowns_plantas.get(planta_seleccionada, 0)
+                                ultimo_tiempo = cooldowns_plantas.get(
+                                    planta_seleccionada, 0
+                                )
                                 cooldown = duracion_cooldown.get(planta_seleccionada, 0)
 
                                 if tiempo_actual - ultimo_tiempo >= cooldown:
                                     # Verificamos cantidad soles y colocamos según planta
-                                    if planta_seleccionada == "girasol" and cant_soles >= 50:
+                                    if (
+                                        planta_seleccionada == "girasol"
+                                        and cant_soles >= 50
+                                    ):
                                         cant_soles -= 50
-                                    elif planta_seleccionada == "nuez" and cant_soles >= 50:
+                                    elif (
+                                        planta_seleccionada == "nuez"
+                                        and cant_soles >= 50
+                                    ):
                                         cant_soles -= 50
-                                    elif planta_seleccionada == "lanzaguisante" and cant_soles >= 100:
+                                    elif (
+                                        planta_seleccionada == "lanzaguisante"
+                                        and cant_soles >= 100
+                                    ):
                                         cant_soles -= 100
-                                    elif planta_seleccionada == "lanzaguisanteTriple" and cant_soles >= 200:
+                                    elif (
+                                        planta_seleccionada == "lanzaguisanteTriple"
+                                        and cant_soles >= 200
+                                    ):
                                         cant_soles -= 200
                                     else:
                                         planta_seleccionada = None
                                         break  # No tenés suficientes soles, no se planta
 
-                                    colocar_planta(fila, columna, planta_seleccionada, grilla, lista_plantas, cant_filas, cant_columnas, img_girasol, img_lanzaguisante, img_lanzaguisante_dispara, img_nuez, img_nuezmitad, img_nuezdañada, img_tralladora, img_tralladora_dispara)
+                                    colocar_planta(
+                                        fila,
+                                        columna,
+                                        planta_seleccionada,
+                                        grilla,
+                                        lista_plantas,
+                                        cant_filas,
+                                        cant_columnas,
+                                        img_girasol,
+                                        img_lanzaguisante,
+                                        img_lanzaguisante_dispara,
+                                        img_nuez,
+                                        img_nuezmitad,
+                                        img_nuezdañada,
+                                        img_tralladora,
+                                        img_tralladora_dispara,
+                                    )
                                     sonido_plantar.play()
-                                    cooldowns_plantas[planta_seleccionada] = tiempo_actual
+                                    cooldowns_plantas[planta_seleccionada] = (
+                                        tiempo_actual
+                                    )
                                     planta_seleccionada = None
                                 else:
                                     planta_seleccionada = None
                                     print("Todavía está en cooldown esa planta.")
 
-                
-
     # Oleadas
-    if puntuacion >=50 and oleada_actual !=7:
+    if puntuacion >= 50 and oleada_actual != 7:
         pesos = (0, 0.25, 0.75)
         tiempo_entre_zombis = 2
         oleada_actual = 7
@@ -288,7 +332,6 @@ while jugando:
         pausar_generacion_zombis = True
         tiempo_reinicio = pygame.time.get_ticks()
 
-    
     elif puntuacion >= 40 and oleada_actual != 6:
         pesos = (0, 0.50, 0.50)
         tiempo_entre_zombis = 3
@@ -333,7 +376,7 @@ while jugando:
         tiempo_mostrar_oleada = pygame.time.get_ticks()
         pausar_generacion_zombis = True
         tiempo_reinicio = pygame.time.get_ticks()
-    
+
     if mostrar_oleada:
         tiempo_actual = pygame.time.get_ticks()
         if tiempo_actual - tiempo_mostrar_oleada < duracion_cartel:
@@ -370,7 +413,10 @@ while jugando:
         planta.dibujar(ventana, offset_y_grilla)
 
         # Chequear si hay zombis en la misma fila
-        hay_zombi_en_fila = any(zombi.devolver_coords()[1] == planta.devolver_coords()[1] for zombi in lista_zombis)
+        hay_zombi_en_fila = any(
+            zombi.devolver_coords()[1] == planta.devolver_coords()[1]
+            for zombi in lista_zombis
+        )
 
         if isinstance(planta, Lanzaguisantes):
             if hay_zombi_en_fila and planta.puede_disparar():
@@ -393,14 +439,11 @@ while jugando:
                 lista_proyectiles.append(p)
                 sonido_disparo.play()
 
-                        
             if isinstance(planta, Lanzaguisantes):
                 if planta.actualizar_animacion():
                     proyectil = planta.disparar(img_proyectil)
                     lista_proyectiles.append(proyectil)
                     sonido_disparo.play()
-                    
-
 
     for guisante in lista_proyectiles:
         guisante.mover()
@@ -422,10 +465,12 @@ while jugando:
                     puntuacion += 1
                 if guisante in lista_proyectiles:
                     sonido_golpe.play()
-                    efecto = EfectoGolpe(zombi.rect.centerx, zombi.rect.centery, img_impacto)
+                    efecto = EfectoGolpe(
+                        zombi.rect.centerx, zombi.rect.centery, img_impacto
+                    )
                     lista_efectos.append(efecto)
                     lista_proyectiles.remove(guisante)
-                    
+
     for zombi in lista_zombis:
         choco = False
         fila_zombi = zombi.y // tamaño_celda
@@ -444,18 +489,19 @@ while jugando:
         if not choco:
             zombi.mover()
         zombi.dibujar(ventana, offset_y_grilla)
-        
-        
+
         for cortadora in lista_cortadoras:
             if zombi.rect.colliderect(cortadora):
                 cortadora.activar()
                 if cortadora.rect.colliderect(zombi):
                     lista_zombis.remove(zombi)
 
-            elif (zombi.x < margen_cortadora-30):
+            elif zombi.x < margen_cortadora - 30:
+                sonido_principal.stop()
+                sonido_mordida.play()
                 jugando = False
                 game_over = True
-                     
+
     for efecto in lista_efectos[:]:
         efecto.dibujar(ventana)
         if efecto.expiro():
@@ -477,10 +523,14 @@ while jugando:
                 if tiempo_pasado < tiempo_total:
                     fraccion_restante = 1 - (tiempo_pasado / tiempo_total)
                     altura_barra = int(rect.height * fraccion_restante)
-                    barra_rect = pygame.Rect(rect.left, rect.top, rect.width, altura_barra)
+                    barra_rect = pygame.Rect(
+                        rect.left, rect.top, rect.width, altura_barra
+                    )
 
                     sombra = pygame.Surface((rect.width, altura_barra), pygame.SRCALPHA)
-                    sombra.fill((50, 50, 50, 160))  # RGBA: gris oscuro con transparencia
+                    sombra.fill(
+                        (50, 50, 50, 160)
+                    )  # RGBA: gris oscuro con transparencia
                     ventana.blit(sombra, (rect.left, rect.top))
 
             # Borde rojo si está seleccionada
@@ -542,12 +592,12 @@ while jugando:
     ventana.blit(texto_valor_T, (515, barra_inferior_inicio + 152))
 
     texto_puntuacion = render_texto(f"Puntuacion {puntuacion}", 30, NEGRO)
-    
+
     ventana.blit(texto_puntuacion, (ancho - 250, 140))
 
     texto_oleada = render_texto(f"Oleada {oleada_actual}", 30, NEGRO)
     ventana.blit(texto_oleada, (ancho - 250, 100))
-    
+
     # Sonido
     if sonido_muteado:
         ventana.blit(img_mute, rect_mute.topleft)
@@ -580,24 +630,29 @@ while jugando:
     pygame.display.update()
 
 # pantalla de game over
-# if vidas <= 0:
-#     sonido_principal.stop()
-#     sonido_mordida.stop()
-#     game_over = True
-#     while game_over:
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 game_over = False
-#             if event.type == pygame.KEYDOWN:
-#                 if event.key == pygame.K_RETURN:
-#                     game_over = False
-#         s = pygame.Surface((1000, 1000))
-#         s.set_alpha(128)
-#         s.fill((0, 0, 0))
-#         imagen_final = cargar_imagen("Imagenes/pantallas/coso.png", (1100, 900))
-#         ventana.blit(s, (0, 0))
-#         ventana.blit(imagen_final, (200, 100))
-#         pygame.display.flip()
-#         reloj.tick(FPS)
+if game_over:
+    # sonido_principal.stop()
+    # sonido_mordida.stop()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    pygame.quit()
+                    sys.exit()
+        ventana.fill((0, 0, 0))
+        ventana.blit(img_game_over, (0, 0))
+
+        # s.fill((0, 0, 0))
+        # ventana.blit(s, (0, 0))
+        # ventana.blit(img_game_over, (200, 100))
+        texto_salida = render_texto("Presioná ENTER para salir", 40, (255, 255, 255))
+        rect_texto = texto_salida.get_rect(center=(ancho // 2, alto - 50))
+        ventana.blit(texto_salida, rect_texto)
+
+        pygame.display.flip()
+        reloj.tick(FPS)
 pygame.quit()

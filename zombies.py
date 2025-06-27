@@ -21,7 +21,7 @@ class Zombie:
         self.fila = random.randint(0, 4)
         self.x = 1010
         self.y = self.fila * tamaño_celda
-        self.velocidad = 12
+        self.velocidad = 0.25
         self.daño = 1
         self.tipo = tipo
         self.imagen = imagen
@@ -85,13 +85,7 @@ class Zombie:
     def devolver_coords(self) -> tuple:
         return (self.x, self.y)
 
-    def actualizar_imagen(
-        self,
-        zombie: pygame.Surface,
-        zombie_sin_brazo: pygame.Surface,
-        zombie_cono_roto: pygame.Surface,
-        zombie_balde_roto: pygame.Surface,
-    ) -> None:
+    def actualizar_imagen(self, zombie: pygame.Surface, zombie_sin_brazo: pygame.Surface, zombie_cono_roto: pygame.Surface, zombie_balde_roto: pygame.Surface) -> None:
         if self.tipo == "cono" and self.vida <= 15 and self.vida > 10:
             self.imagen = zombie_cono_roto
 

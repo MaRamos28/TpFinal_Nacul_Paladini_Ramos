@@ -67,10 +67,13 @@ def mostrar_menu():
                     sonido_menu.stop()
                     return 
                 elif rect_tutorial.collidepoint(evento.pos):
-                    webbrowser.open("https://www.youtube.com/")  
+                    webbrowser.open("https://www.youtube.com/watch?v=A4ebxSGXFyc")  
                 elif rect_exit.collidepoint(evento.pos):
                     sonido_menu.stop()
                     pygame.quit()
         
         ventana.blit(imagen_actual, (0, 0))
         pygame.display.update()
+        
+if __name__ == "__main__":
+    mostrar_menu() # Prueba individual

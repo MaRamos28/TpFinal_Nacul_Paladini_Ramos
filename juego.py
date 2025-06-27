@@ -265,7 +265,7 @@ def juego():
             pausar_generacion_zombis = True
             tiempo_reinicio = pygame.time.get_ticks()
 
-        elif puntuacion >= 40 and oleada_actual != 6:
+        elif puntuacion >= 40 and puntuacion < 50 and oleada_actual != 6:
             pesos = (0, 0.50, 0.50)
             tiempo_entre_zombis = 3
             oleada_actual = 6

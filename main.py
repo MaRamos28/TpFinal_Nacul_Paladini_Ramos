@@ -10,4 +10,4 @@ if __name__ == "__main__":
         if resultado == "menu":
             continue
         else:
-            break
+            breakz

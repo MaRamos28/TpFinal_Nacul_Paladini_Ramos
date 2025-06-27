@@ -1,5 +1,6 @@
 from menu import mostrar_menu
 from juego import juego
+
 if __name__ == "__main__":
     while True:
         mostrar_menu()
@@ -10,4 +11,4 @@ if __name__ == "__main__":
         if resultado == "menu":
             continue
         else:
-            breakz
+            break

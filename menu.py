@@ -9,6 +9,8 @@ pygame.mixer.init()
 
 ANCHO = 1100
 ALTO = 690
+
+# Configuración de la ventana
 ventana = pygame.display.set_mode((ANCHO, ALTO))
 sonido_seleccionar = pygame.mixer.Sound("musica/efectos/sonido seleccionar menu.mp3")
 sonido_menu = pygame.mixer.Sound("musica/menu.mp3")
@@ -18,6 +20,7 @@ rect_start = pygame.Rect(600, 115, 420, 100)
 rect_tutorial = pygame.Rect(605, 250, 400, 100)
 rect_exit = pygame.Rect(590, 380, 380, 100)
 
+# cargo imagenes de las pantallas del menu
 menu = cargar_imagen("Imagenes/pantallas/Menu_inicial.png", (ANCHO, ALTO))
 menu_load = cargar_imagen("Imagenes/pantallas/menu load game.png", (ANCHO, ALTO))
 menu_tutorial = cargar_imagen("Imagenes/pantallas/menu tutorial.png", (ANCHO, ALTO))
@@ -25,6 +28,11 @@ menu_exit = cargar_imagen("Imagenes/pantallas/menu exit.png", (ANCHO, ALTO))
 
 
 def mostrar_menu():
+    """
+    Muestra el menú principal del juego.
+    Permite al usuario iniciar el juego, ver el tutorial o salir del juego.
+
+    """
     imagen_actual = menu
     toco = False
     sonido_menu.play(-1)
@@ -33,7 +41,7 @@ def mostrar_menu():
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 pygame.quit()
-            
+
             if evento.type == pygame.MOUSEMOTION:
                 if rect_start.collidepoint(evento.pos):
                     imagen_actual = menu_load
@@ -48,7 +56,7 @@ def mostrar_menu():
                         imagen_actual = menu_exit
                         sonido_seleccionar.play()
                         toco = True
-    
+
                 elif rect_tutorial.collidepoint(evento.pos):
                     imagen_actual = menu_tutorial
                     if rect_tutorial.collidepoint(evento.pos) and not toco:
@@ -62,18 +70,19 @@ def mostrar_menu():
                 pygame.display.update()
 
             if evento.type == pygame.MOUSEBUTTONDOWN:
-                evento.pos  
+                evento.pos
                 if rect_start.collidepoint(evento.pos):
                     sonido_menu.stop()
-                    return 
+                    return
                 elif rect_tutorial.collidepoint(evento.pos):
-                    webbrowser.open("https://www.youtube.com/watch?v=A4ebxSGXFyc")  
+                    webbrowser.open("https://www.youtube.com/watch?v=A4ebxSGXFyc")
                 elif rect_exit.collidepoint(evento.pos):
                     sonido_menu.stop()
                     pygame.quit()
-        
+
         ventana.blit(imagen_actual, (0, 0))
         pygame.display.update()
-        
+
+
 if __name__ == "__main__":
-    mostrar_menu() # Prueba individual
+    mostrar_menu()  # Prueba individual

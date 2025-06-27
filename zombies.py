@@ -83,9 +83,29 @@ class Zombie:
             pygame.draw.rect(ventana, (100, 0, 0), self.rect)
 
     def devolver_coords(self) -> tuple:
+        """
+        Devuelve las coordenadas del zombie.
+        output:
+            Una tupla con las coordenadas (x, y) del zombie.
+        """
         return (self.x, self.y)
 
-    def actualizar_imagen(self, zombie: pygame.Surface, zombie_sin_brazo: pygame.Surface, zombie_cono_roto: pygame.Surface, zombie_balde_roto: pygame.Surface) -> None:
+    def actualizar_imagen(
+        self,
+        zombie: pygame.Surface,
+        zombie_sin_brazo: pygame.Surface,
+        zombie_cono_roto: pygame.Surface,
+        zombie_balde_roto: pygame.Surface,
+    ) -> None:
+        """
+        Actualiza la imagen del zombie según su tipo y vida.
+        input:
+            zombie: imagen del zombie normal
+            zombie_sin_brazo: imagen del zombie sin brazo
+            zombie_cono_roto: imagen del zombie cono roto
+            zombie_balde_roto: imagen del zombie balde roto
+
+        """
         if self.tipo == "cono" and self.vida <= 15 and self.vida > 10:
             self.imagen = zombie_cono_roto
 
